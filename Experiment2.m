@@ -17,7 +17,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=2:2 :10
+for loop=[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -32,7 +32,7 @@ x=zeros(N_2,N_1,2);
 G_n=G_matrix(N_1,N_2);
 %% Material coeficient matrix
 
- Pixels = imread('structure_3.png');
+ Pixels = imread('structure_2.png');
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
@@ -129,59 +129,71 @@ toler = 1e-6;
 %% SOLVER without preconditionig
 c_000=rand(N_2,N_1);
 c_0 = c_000;
-for k=1:2 
-    tic;
+for k=1:1
     E=E_0(:,k); 
+    tic;
     [C,st]=CG_solver(A,G_n,c_0,E,steps,toler); % without preconditioning
-    T1(counter,k) = toc;
-    S1(counter,k) = st;
-    A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
+    T1(k,counter) = toc;
+    S1(k,counter) = st;
+    %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
 end
 %% SOLVER with constant preconditionig
 c_0=c_000;
-for k=1:2
-    tic;
+for k=1:1
     E=E_0(:,k);
+    tic;
     [C,st]=CGP_solver_constant(A,G_n,c_0,E,steps,toler,GG0);% with preconditioning
-    T2(counter,k) = toc;
-    S2(counter,k) = st
-    A_02(:,k)=Hom_parameter(C,A,G_n,E);% Compute homogenized parameter
+    T2(k,counter)=toc;
+    S2(k,counter) = st;
+    %A_02(:,k)=Hom_parameter(C,A,G_n,E);% Compute homogenized parameter
 end
 %% SOLVER with efficient enhanced preconditionig
 c_0=c_000;
-for k=1:2
-    tic;
+for k=1:1
     E=E_0(:,k);
+    tic;
     [C,st]=CGP_solver_1f_v3(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
-    S3(counter,k) = st;
-    A_03(:,k)=Hom_parameter(C,A,G_n,E);% Compute homogenized parameter
-    T3(counter,k)=toc;
+    T3(k,counter)=toc;
+    S3(k,counter) = st;
+    %A_03(:,k)=Hom_parameter(C,A,G_n,E);% Compute homogenized parameter
 end
 %% error 
   NoP(counter)=N_1*N_2;
   counter=counter+1;
 end
-%% Plot 
+%% 
+save('experiment_data/exp2/NoP.mat','NoP');
+save('experiment_data/exp2/S1.mat','S1');
+save('experiment_data/exp2/S2.mat','S2');
+save('experiment_data/exp2/S3.mat','S3');
+save('experiment_data/exp2/T1.mat','T1');
+save('experiment_data/exp2/T2.mat','T2');
+save('experiment_data/exp2/T3.mat','T3'); 
+
+
+
+%% Plot
 % Plot steps
 figure 
  hold on
- plot(NoP,S1(:,1),'r')
- plot(NoP,S1(:,2),'--r')
+ plot(NoP,S1(1,:),'r')
+ %plot(NoP,S1(:,2),'--r')
  
- plot(NoP,S2(:,1),'b')
- plot(NoP,S2(:,2),'--b')
-  plot(NoP,S3(:,1),'black')
- plot(NoP,S3(:,2),'--black')
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2')
+ plot(NoP,S2(1,:),'b')
+% plot(NoP,S2(:,2),'--b')
+ plot(NoP,S3(1,:))
+ 
+% plot(NoP,S3(:,2),'--black')
+ legend('M_0','M_1','M_2')
 % Plot times
  figure 
  hold on
- plot(NoP,T1(:,1),'r')
- plot(NoP,T1(:,2),'--r')
- plot(NoP,T2(:,1),'b')
- plot(NoP,T2(:,2),'--b')
-  plot(NoP,T3(:,1),'black')
- plot(NoP,T3(:,2),'--black')
+ plot(NoP,T1(1,:),'r')
+% plot(NoP,T1(:,2),'--r')
+ plot(NoP,T2(1,:),'b')
+% plot(NoP,T2(:,2),'--b')
+  plot(NoP,T3(1,:),'black')
+% plot(NoP,T3(:,2),'--black')
  legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2')
  %% Plot A function
  
