@@ -19,7 +19,7 @@ A_0=zeros(2,2);
 %for par=1:10
 loop1=1;
 counter=1;
-for loop=1:1:20
+for loop=1:2:18
   par=loop 
 N_1=101; % 2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
@@ -139,8 +139,8 @@ for k=1:1
     E=E_0(:,k); 
     tic;
     [C,st]=CG_solver(A,G_n,c_0,E,steps,toler); % without preconditioning
-    T1(k,counter) = toc;
-    S1(k,counter) = st;
+    T1(counter,k) = toc;
+    S1(counter,k) = st;
     %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
 end
 %% SOLVER with constant preconditionig
@@ -165,7 +165,7 @@ for k=1:1
 end
 %% error 
  % NoP(counter)=N_1*N_2;
-   NoP(1,counter)=par;
+   NoP(counter)=par;
 
   % isos(counter)=Pomer12;
     Kappa(counter,:)=[Min_eig,Max_eig,Max_kappa]
@@ -173,7 +173,7 @@ end
     
     
 end
-save('experiment_data/exp3/NoP.mat','NoP');
+save('experiment_data/exp3/Pomer12.mat','Pomer12');
 save('experiment_data/exp3/S1.mat','S1');
 save('experiment_data/exp3/S2.mat','S2');
 save('experiment_data/exp3/S3.mat','S3');
@@ -181,9 +181,13 @@ save('experiment_data/exp3/T1.mat','T1');
 save('experiment_data/exp3/T2.mat','T2');
 save('experiment_data/exp3/T3.mat','T3'); 
 
-% hold on
-%plot3(Pomer12,Kappa(:,3),S1(:,1),'r')
+ hold on
+plot3(Pomer12,Kappa(:,3),S1(:,1),'r')
 
+plot3(Pomer12,Kappa(:,3),S2(:,1),'b')
+
+ xlabel("\kappa_A/\kappa_B")
+ ylabel("\kappa")
 
 %end
 %% Plot 
