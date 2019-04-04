@@ -1,7 +1,8 @@
-function [c_1,st,norm_evol] = CG_solver(A,G_n,c_0,E,steps,toler,M_m)
+function [c_1,st,norm_evol] = CG_solver_symPrec(A,G,c_0,E,steps,toler,M_m)
 %% input
 % A   [N_bf2,N_bf1,2,2]- matrix of material parameters in every point of grid
-% G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
+% G_i [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative with incorporated preconditioner M.^(-1/2) from both sides
+% M   [N_bf2,N_bf1,2]   -preconditioning matrix M.^(-1/2)
 % c_0 [N_bf2,N_bf1]     -initial solution
 % E   [2,1]             -vector [0;1] or [1;0]
 % toler [1]             -relative tolerance
@@ -12,10 +13,12 @@ function [c_1,st,norm_evol] = CG_solver(A,G_n,c_0,E,steps,toler,M_m)
 %% 
 % toler           % relative tolerance
 % steps           % -max number of steps
+norm_evol=0;
 
 c_1=c_0./M_m;
-M_0 = LHS_freq(A,c_1,G_n);
-b_0 = RHS_freq(A,E,G_n);
+M_0 = LHS_freq_symP(A,c_1,G,M_m);
+
+b_0 = M_m.*RHS_freq(A,E,G);
 
 r_0 = b_0-M_0; % 
 
@@ -23,13 +26,13 @@ nr0 = norm(r_0.*(M_m.^-2).*r_0,'fro');
 
 p_0 = r_0;
 for st = 1:steps
-    
-    M_1 = LHS_freq(A,p_0,G_n);
+    M_1 = LHS_freq_symP(A,p_0,G,M_m);
     alfa_0 =sum(sum((r_0.')'.*r_0))/sum(sum((p_0.')'.*M_1));
+    
     x_1 = c_1 + alfa_0*p_0;
     r_1 = r_0 - alfa_0*M_1;
     norm_evol(st)=norm(r_1.*(M_m.^-2).*r_1,'fro')/nr0;
-    if ( norm_evol(st)<toler)
+    if (norm_evol(st)<toler)
          c_1 = x_1; 
          break; 
     end
@@ -40,7 +43,7 @@ for st = 1:steps
     p_0 = p_1;
     r_0 = r_1;
     c_1 = x_1 ;
+%    norm_evol(st)=norm(c_1,'fro');
 end
 c_1 =c_1.*M_m;
-%x_0=fftshift(ifft2(ifftshift(c_0)));
 end

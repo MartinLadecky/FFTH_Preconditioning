@@ -77,6 +77,8 @@ G_n=G_matrix(N_1,N_2);
 d=[mean(mean(A(:,:,1,1))) mean(mean(A(:,:,1,2))) ;...
    mean(mean(A(:,:,2,1))) mean(mean(A(:,:,2,2)))];
 
+G_m=G_mean(N_1,N_2,d);
+
 M_f_const= d(1,1).*(G_n(:,:,1).^2)+d(2,2).*(G_n(:,:,2).^2)...
                    +2*d(1,2).*(G_n(:,:,1).*(G_n(:,:,2)));  
 M_f_const((end+1)/2,(end+1)/2)=1;
@@ -143,6 +145,21 @@ for k=1:1
     S1(k,counter) = st;
     %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
 end
+
+%% SOLVER without preconditionig
+c_000=rand(N_2,N_1);
+c_0 = c_000;
+for k=1:1
+    E=E_0(:,k); 
+    tic;
+    [C,st]=CG_solver(A,G_m,c_0,E,steps,toler); % without preconditioning
+    T4(k,counter) = toc;
+    S4(k,counter) = st;
+    %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
+end
+
+
+
 %% SOLVER with constant preconditionig
 c_0=c_000;
 for k=1:1
@@ -197,7 +214,10 @@ figure
  %plot(NoP,S2(:,2),'--b')
   plot(NoP,S3(1,:),'black')
 % plot(NoP,S3(:,2),'--black')
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2')
+  plot(NoP,S4(1,:),'green')
+
+
+ legend('M_0,E_1','M_1','M_2','M_3')
 % Plot times
  figure 
  hold on
@@ -207,6 +227,7 @@ figure
 % plot(NoP,T2(:,2),'--b')
   plot(NoP,T3(1,:),'black')
 % plot(NoP,T3(:,2),'--black')
+  plot(NoP,T4(1,:),'green')
  legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2')
  %% Plot A function
  
