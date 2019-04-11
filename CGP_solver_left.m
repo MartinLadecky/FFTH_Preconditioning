@@ -12,7 +12,7 @@ function [c_1,st,norm_evol] = CGP_solver_left(A,G,c_0,E,steps,toler,M_f)
 %% 
 % toler           % relative toleranceF
 % steps           % -max number of steps
-norm_evol=0;
+%norm_evol=0;
 M_0 = LHS_freq(A,c_0,G); % System matrix * initial solution(x_0=c_0)
 b_0 = RHS_freq(A,E,G);     % Right hand side vector
 
@@ -36,8 +36,8 @@ for st = 1:steps
 %    
     c_1 = c_0 + alfa_0.*p_0;
     r_1 = r_0-alfa_0*Ap_0;
-    
-        if (norm(r_1.*r_1,'fro')/nr0<toler)
+    norm_evol(st)=norm(r_1.*r_1,'fro')/nr0;
+        if ( norm_evol(st)<toler)
             % c_1 = c_0; 
             break; 
         end    

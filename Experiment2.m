@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=(1:2:18)%[1,5,10,14,17,19,20,21,22]
+for loop=(5:3:16)%[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -33,6 +33,8 @@ x=zeros(N_2,N_1,2);
 %% Material coeficient matrix and data analysis
 
  Pixels = imread('structure_2.png');
+%  structure = matfile('structure11.mat');
+%  Pixels = structure.newimage;
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
@@ -164,10 +166,10 @@ c_0=c_000;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
+    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
-     A_3(:,k)=Hom_parameter(C3,A,G_n,E)% Compute homogenized parameter
+    A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
 %     [C33,st]=CGP_solver_1f_v3(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2);
 %      T33(k,counter)=toc;
 %     S33(k,counter) = st;
@@ -178,13 +180,13 @@ end
   counter=counter+1;
 end
 %% 
-save('experiment_data/exp2/NoP.mat','NoP');
-save('experiment_data/exp2/S1.mat','S1');
-save('experiment_data/exp2/S2.mat','S2');
-save('experiment_data/exp2/S3.mat','S3');
-save('experiment_data/exp2/T1.mat','T1');
-save('experiment_data/exp2/T2.mat','T2');
-save('experiment_data/exp2/T3.mat','T3'); 
+% save('experiment_data/exp2/NoP.mat','NoP');
+% save('experiment_data/exp2/S1.mat','S1');
+% save('experiment_data/exp2/S2.mat','S2');
+% save('experiment_data/exp2/S3.mat','S3');
+% save('experiment_data/exp2/T1.mat','T1');
+% save('experiment_data/exp2/T2.mat','T2');
+% save('experiment_data/exp2/T3.mat','T3'); 
 
 
 %% Plot
@@ -193,32 +195,23 @@ save('experiment_data/exp2/T3.mat','T3');
  plot((1:S1(1,end)) ,norm_evol1)
  plot((1:S2(1,end)),norm_evol2)
  plot((1:S3(1,end)),norm_evol3)
-
+set(gca, 'XScale', 'log', 'YScale', 'log');
+legend('G_n','G_m','M_2')
 
 % Plot steps
 figure 
  hold on
  plot(NoP,S1(1,:),'r')
-%plot(NoP,S1(:,2),'--r')
- 
  plot(NoP,S2(1,:),'b')
-%plot(NoP,S2(:,2),'--b')
- % plot(NoP,S22(1,:),'--b')
-%plot(NoP,S2(:,2),'--b')
  plot(NoP,S3(1,:),'black')
-%plot(NoP,S3(:,2),'--black')
- 
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2','M_2,E_1','M_2,E_2')
+legend('G_n','G_m','M_2')
+
 % Plot times
  figure 
  hold on
  plot(NoP,T1(1,:),'r')
- %plot(NoP,T1(:,2),'--r')
  plot(NoP,T2(1,:),'b')
- %plot(NoP,T2(:,2),'--b')
-%  plot(NoP,T22(1,:),'--b')
  plot(NoP,T3(1,:),'black')
- %plot(NoP,T3(:,2),'--black')
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2','M_2,E_1','M_2,E_2')
+legend('G_n','G_m','M_2')
  
  

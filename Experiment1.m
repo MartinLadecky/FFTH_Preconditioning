@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=(1:2:18);%[1,5,10,14,17,19,20,21,22]
+for loop=(5:2:12);%[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -123,8 +123,8 @@ for r = 1:N_2
 end
 
 %% Conditions:
-steps = 250;
-toler = 1e-12;
+steps = 400;
+toler = 1e-10;
 c_000=rand(N_2,N_1);
 
 %% SOLVERs with M_0 preconditionig
@@ -163,52 +163,45 @@ for k=1:1
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
 end
+
 %% error 
   NoP(counter)=N_1*N_2;
   counter=counter+1;
 end
 %% Save plot data 
-save('experiment_data/exp1/NoP.mat','NoP');
-save('experiment_data/exp1/S1.mat','S1');
-save('experiment_data/exp1/S2.mat','S2');
-save('experiment_data/exp1/S3.mat','S3');
-save('experiment_data/exp1/T1.mat','T1');
-save('experiment_data/exp1/T2.mat','T2');
-save('experiment_data/exp1/T3.mat','T3');
+% save('experiment_data/exp1/NoP.mat','NoP');
+% save('experiment_data/exp1/S1.mat','S1');
+% save('experiment_data/exp1/S2.mat','S2');
+% save('experiment_data/exp1/S3.mat','S3');
+% save('experiment_data/exp1/T1.mat','T1');
+% save('experiment_data/exp1/T2.mat','T2');
+% save('experiment_data/exp1/T3.mat','T3');
 
 
 %% Plot
  figure 
  hold on
- plot((1:S1(1,end)) ,norm_evol1)
- plot((1:S2(1,end)),norm_evol2)
- plot((1:S3(1,end)),norm_evol3)
-
+ loglog((1:S1(1,end)) ,norm_evol1)
+ loglog((1:S2(1,end)),norm_evol2)
+ loglog((1:S3(1,end)),norm_evol3)
+set(gca, 'XScale', 'log', 'YScale', 'log');
+legend('G_n','G_m','M_2')
 
 % Plot steps
 figure 
  hold on
  plot(NoP,S1(1,:),'r')
-%plot(NoP,S1(:,2),'--r')
- 
  plot(NoP,S2(1,:),'b')
-%plot(NoP,S2(:,2),'--b')
- % plot(NoP,S22(1,:),'--b')
-%plot(NoP,S2(:,2),'--b')
  plot(NoP,S3(1,:),'black')
-%plot(NoP,S3(:,2),'--black')
- 
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2','M_2,E_1','M_2,E_2')
+  plot(NoP,S4(1,:),'black')
+legend('G_n','G_m','M_2')
+
 % Plot times
  figure 
  hold on
  plot(NoP,T1(1,:),'r')
- %plot(NoP,T1(:,2),'--r')
  plot(NoP,T2(1,:),'b')
- %plot(NoP,T2(:,2),'--b')
-%  plot(NoP,T22(1,:),'--b')
  plot(NoP,T3(1,:),'black')
- %plot(NoP,T3(:,2),'--black')
- legend('M_0,E_1','M_0,E_2','M_1,E_1','M_1,E_2','M_2,E_1','M_2,E_2')
+legend('G_n','G_m','M_2')
  %% Plot A function
  
