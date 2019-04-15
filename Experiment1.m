@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=[1,5,10,14,17,19,20,21,22]
+for loop=[1,5,10,14,17,19,20]
 N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
@@ -125,7 +125,7 @@ for r = 1:N_2
 end
 
 %% Conditions:
-steps = 100;
+steps =300;
 toler = 1e-10;
 c_000=rand(N_2,N_1);
 

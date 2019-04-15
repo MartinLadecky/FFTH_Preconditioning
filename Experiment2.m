@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=22%(1:3:16)%[1,5,10,14,17,19,20,21,22]
+for loop=(1:3:15)%[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -32,9 +32,9 @@ x=zeros(N_2,N_1,2);
 
 %% Material coeficient matrix and data analysis
 
- %Pixels = imread('structure_2.png');
-  structure = matfile('structure11.mat');
-  Pixels = structure.newimage;
+ Pixels = imread('structure_3.png');
+ % structure = matfile('structure11.mat');
+%  Pixels = structure.newimage;
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
@@ -45,7 +45,7 @@ x=zeros(N_2,N_1,2);
  A=zeros(N_2,N_1,2,2);  
   for i=1:N_2
      for j=1:N_1    
-          A(i,j,:,:)=a_matrix_imgx(Pixels(piya(i),pixa(j)));
+          A(i,j,:,:)=a_matrix_img(Pixels(piya(i),pixa(j)));
          pom = zeros(2);
          pom(1,1) = A(i,j,1,1); pom(1,2) = A(i,j,1,2);
          pom(2,1) = A(i,j,2,1); pom(2,2) = A(i,j,2,2);        
@@ -166,7 +166,7 @@ c_0=c_000;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
+    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2); % with better preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
