@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=[1,5,10,14,17,19,20]
+for loop=22;%[1,5,10,14,17,19,20]
 N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
@@ -53,7 +53,7 @@ x=zeros(N_2,N_1,2);
      end       
  end
  Max_kappa = Max_eig/Min_eig;
- [Min_eig,Max_eig,Max_kappa];
+ [Min_eig,Max_eig,Max_kappa]
  if Min_eig<0
      
      return

@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=(1:3:15)%[1,5,10,14,17,19,20,21,22]
+for loop=22;%(1:3:15)%[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -32,9 +32,9 @@ x=zeros(N_2,N_1,2);
 
 %% Material coeficient matrix and data analysis
 
- Pixels = imread('structure_3.png');
- % structure = matfile('structure11.mat');
-%  Pixels = structure.newimage;
+ Pixels = imread('structure_4.png');
+  %structure = matfile('structure11.mat');
+  %Pixels = structure.newimage;
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));

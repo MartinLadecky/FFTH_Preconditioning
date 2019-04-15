@@ -29,7 +29,6 @@ for s = 1:n1-1
         pom = conj(U2(:,s))./U1(:,s);    %delenie poddiag diag celnom, pre vsetky bloky naraz    
         r_pom(:,s+1) = r_pom(:,s+1) - r_pom(:,s).*pom; 
 end
-
     r_pom= r_pom./U1;% vydelim diagonalov
 for s = n1:-1:2
         pom = U2(:,s-1)./U1(:,s);
@@ -65,7 +64,7 @@ for st = 1:steps
         r_pom(:,s-1) = r_pom(:,s-1) - r_pom(:,s).*pom; 
     end
     z_1 = r_pom./U1;  
-    %old
+
     beta_1 = (sum(sum((z_1.')'.*r_1))/sum(sum((z_0.')'.*r_0)));
     p_1 = z_1 + beta_1*p_0;    
     %% 
