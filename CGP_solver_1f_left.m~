@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol] = CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2)
+function [c_1,st,norm_evol] = CGP_solver_1f_left(A,G,c_0,E,steps,toler,M_d,M_f,U1,U2)
 %% input
 % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
 % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
@@ -13,11 +13,10 @@ function [c_1,st,norm_evol] = CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2)
 % toler           % relative tolerance
 % steps           % max number of steps
 
-[n2,n1] = size(c_0);
-
 M_0 = LHS_freq(A,c_0,G); % System matrix * initial solution(x_0=c_0)
 b_0 = RHS_freq(A,E,G);% Right hand side vector
 
+[n2,n1] = size(M_f);
 
 r_0 = b_0-M_0; % x_0=0
 
@@ -66,7 +65,7 @@ for st = 1:steps
     end
     z_1 = r_pom./U1;  
     %old
-    beta_1 = (sum(sum((z_1.')'.*r_1))/sum(sum((z_0.')'.*r_0)));
+    beta_1 = (sum(sum((z_1.')'.*r_1))/sum(sum((r_0.')'.*r_0)));
     p_1 = z_1 + beta_1*p_0;    
     %% 
     p_0 = p_1;

@@ -17,7 +17,8 @@ M_0 = LHS_freq(A,c_0,G); % System matrix * initial solution(x_0=c_0)
 b_0 = RHS_freq(A,E,G);     % Right hand side vector
 
 r_0 = b_0-M_0; % x_0=0
- nr0 = norm(r_0.*r_0,'fro')
+ nr0 =norm(r_0,'fro')
+ %norm(r_0.*r_0,'fro')
  
 z_0 = r_0./M_f; % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
 
@@ -36,7 +37,7 @@ for st = 1:steps
 %    
     c_1 = c_0 + alfa_0.*p_0;
     r_1 = r_0-alfa_0*Ap_0;
-    norm_evol(st)=norm(r_1.*r_1,'fro')/nr0;
+    norm_evol(st)=norm(r_1,'fro')/nr0;
         if ( norm_evol(st)<toler)
             % c_1 = c_0; 
             break; 

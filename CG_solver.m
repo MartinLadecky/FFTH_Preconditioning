@@ -19,7 +19,8 @@ b_0 = RHS_freq(A,E,G_n);
 
 r_0 = b_0-M_0; % 
 
-nr0 = norm(r_0.*(M_m.^-2).*r_0,'fro');
+%nr0 = norm(r_0.*(M_m.^-2).*r_0,'fro');
+nr0 = sqrt(sum(sum(abs(r_0.*(M_m.^-2).*r_0))));
 
 p_0 = r_0;
 for st = 1:steps
@@ -28,7 +29,8 @@ for st = 1:steps
     alfa_0 =sum(sum((r_0.')'.*r_0))/sum(sum((p_0.')'.*M_1));
     x_1 = c_1 + alfa_0*p_0;
     r_1 = r_0 - alfa_0*M_1;
-    norm_evol(st)=norm(r_1.*(M_m.^-2).*r_1,'fro')/nr0;
+    norm_evol(st)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;  %sum(sum(r_1.*(M_m.^-2).*r_1))/nr0;
+                    
     if ( norm_evol(st)<toler)
          c_1 = x_1; 
          break; 

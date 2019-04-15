@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=(5:3:16)%[1,5,10,14,17,19,20,21,22]
+for loop=22%(1:3:16)%[1,5,10,14,17,19,20,21,22]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -32,9 +32,9 @@ x=zeros(N_2,N_1,2);
 
 %% Material coeficient matrix and data analysis
 
- Pixels = imread('structure_2.png');
-%  structure = matfile('structure11.mat');
-%  Pixels = structure.newimage;
+ %Pixels = imread('structure_2.png');
+  structure = matfile('structure11.mat');
+  Pixels = structure.newimage;
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
@@ -45,7 +45,7 @@ x=zeros(N_2,N_1,2);
  A=zeros(N_2,N_1,2,2);  
   for i=1:N_2
      for j=1:N_1    
-          A(i,j,:,:)=a_matrix_img(Pixels(piya(i),pixa(j)));
+          A(i,j,:,:)=a_matrix_imgx(Pixels(piya(i),pixa(j)));
          pom = zeros(2);
          pom(1,1) = A(i,j,1,1); pom(1,2) = A(i,j,1,2);
          pom(2,1) = A(i,j,2,1); pom(2,2) = A(i,j,2,2);        
@@ -133,7 +133,7 @@ end
 
 %% Conditions:
 steps = 500;
-toler = 1e-6;
+toler = 1e-10;
 c_000=rand(N_2,N_1);
 %% SOLVERs with M_0 preconditionig
 % Preconditioner incorporated in G matricies
@@ -188,6 +188,23 @@ end
 % save('experiment_data/exp2/T2.mat','T2');
 % save('experiment_data/exp2/T3.mat','T3'); 
 
+NoS1=(1:S1(1,end));
+NoS2=(1:S2(1,end));
+NoS3=(1:S3(1,end));
+
+save('experiment_data/expPAMM/NoP.mat','NoP'); 
+
+save('experiment_data/expPAMM/NoS1.mat','NoS1'); 
+save('experiment_data/expPAMM/NoS2.mat','NoS2');
+save('experiment_data/expPAMM/NoS3.mat','NoS3');
+
+
+save('experiment_data/expPAMM/S1.mat','S1');
+ save('experiment_data/expPAMM/S2.mat','S2');
+ save('experiment_data/expPAMM/S3.mat','S3');
+save('experiment_data/expPAMM/T1.mat','norm_evol1');
+save('experiment_data/expPAMM/T2.mat','norm_evol2');
+save('experiment_data/expPAMM/T3.mat','norm_evol3'); 
 
 %% Plot
  figure 

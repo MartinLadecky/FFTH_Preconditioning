@@ -18,8 +18,8 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=(5:2:12);%[1,5,10,14,17,19,20,21,22]
-N_1=2*(loop^2)+1% number of points in x_1-1
+for loop=[1,5,10,14,17,19,20,21,22]
+N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
 
@@ -53,8 +53,9 @@ x=zeros(N_2,N_1,2);
      end       
  end
  Max_kappa = Max_eig/Min_eig;
- [Min_eig,Max_eig,Max_kappa]
+ [Min_eig,Max_eig,Max_kappa];
  if Min_eig<0
+     
      return
  end
 
@@ -105,25 +106,26 @@ for r = 1:N_2
     m1 = GG0(r,:); % radek Predpod matice 0f
     m2 = GG1(r,:); % radek Predpod matice 1f  
     p = spdiags([m2(1:N_1-1)'],[-1],N_1,N_1); % zoradi m2 riadok do poddiagonaly, riedka matica
-    p = p + p' + diag(m1);     
+    p =p + p' + diag(m1);     
     P(:,:,r) = p;% zaradi to do glob matice
 end  
-
 U1 = zeros(N_2,N_1);
+
 U2 = U1;
 for r = 1:N_2    
     m1 = GG0(r,:);
     m2 = GG1(r,:);    
     p = spdiags([m2(1:N_1-1)'],[-1],N_1,N_1);
 %     p(1,N_1) = m2(N_1);  % ZDE OPRAVA NEBO NE
-    p = p + p' + diag(m1); 
+    p =   p + p' + diag(m1);
+
     pom = chol(p);  % p = pom'*pom % chol rozklad
     U1(r,:) = diag(pom); % diagonala chol
     U2(r,1:N_1-1) = diag(pom,1); % mimodiagonala chol
 end
 
 %% Conditions:
-steps = 400;
+steps = 100;
 toler = 1e-10;
 c_000=rand(N_2,N_1);
 
@@ -136,7 +138,7 @@ for k=1:1
     [C1,st,norm_evol1]=CG_solver(A,G_n,c_0,E,steps,toler,M_n);
     T1(k,counter) = toc;
     S1(k,counter) = st;
-    A_1(:,k)=Hom_parameter(C1,A,G,E) % Compute homogenized parameter
+    A_1(:,k)=Hom_parameter(C1,A,G,E); % Compute homogenized parameter
 end
 %% SOLVERs with M_1 preconditionig
 c_0 = c_000;
@@ -146,19 +148,19 @@ for k=1:1
     [C2,st,norm_evol2]=CG_solver(A,G_m,c_0,E,steps,toler,M_m);
     T2(k,counter) = toc;
     S2(k,counter) = st;
-    A_2(:,k)=Hom_parameter(C2,A,G,E) % Compute homogenized parameter
-   
-%    [C22,st,norm_evol2]=CGP_solver_left(A,G,c_0,E,steps,toler,M_f_const);
-%     T22(k,counter) = toc;
-%     S22(k,counter) = st;
-%    A_22(:,k)=Hom_parameter(C22,A,G,E)
+    A_2(:,k)=Hom_parameter(C2,A,G,E); % Compute homogenized parameter
+%    tic;
+%     [C22,st,norm_evol22]=CGP_solver_left(A,G,c_0,E,steps,toler,M_f_const);
+%      T22(k,counter) = toc;
+%      S22(k,counter) = st;
+%     A_22(:,k)=Hom_parameter(C22,A,G,E)
 end
 %% SOLVER with M_2 preconditionig
 c_0=c_000;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
+    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2); % with better preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
@@ -177,12 +179,25 @@ end
 % save('experiment_data/exp1/T2.mat','T2');
 % save('experiment_data/exp1/T3.mat','T3');
 
+NoS1=(1:S1(1,end));
+NoS2=(1:S2(1,end));
+NoS3=(1:S3(1,end));
+save('experiment_data/expPAMM1/NoS1.mat','NoS1'); 
+save('experiment_data/expPAMM1/NoS2.mat','NoS2');
+save('experiment_data/expPAMM1/NoS3.mat','NoS3');
 
+save('experiment_data/expPAMM1/S1.mat','S1');
+ save('experiment_data/expPAMM1/S2.mat','S2');
+ save('experiment_data/expPAMM1/S3.mat','S3');
+save('experiment_data/expPAMM1/T1.mat','norm_evol1');
+save('experiment_data/expPAMM1/T2.mat','norm_evol2');
+save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
 %% Plot
  figure 
  hold on
  loglog((1:S1(1,end)) ,norm_evol1)
  loglog((1:S2(1,end)),norm_evol2)
+% loglog((1:S22(1,end)),norm_evol22)
  loglog((1:S3(1,end)),norm_evol3)
 set(gca, 'XScale', 'log', 'YScale', 'log');
 legend('G_n','G_m','M_2')
@@ -193,7 +208,7 @@ figure
  plot(NoP,S1(1,:),'r')
  plot(NoP,S2(1,:),'b')
  plot(NoP,S3(1,:),'black')
-  plot(NoP,S4(1,:),'black')
+ % plot(NoP,S4(1,:),'black')
 legend('G_n','G_m','M_2')
 
 % Plot times

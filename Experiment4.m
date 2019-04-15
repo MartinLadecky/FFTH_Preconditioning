@@ -17,7 +17,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=(1:2:10)%[1,5,10,11]%,20,21,22
+for loop=(5:2:10)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
