@@ -19,9 +19,9 @@ A_0=zeros(2,2);
 %for par=1:10
 loop1=1;
 counter=1;
-for loop=1:1:10
+for loop=1:2:20
   par=loop 
-N_1=101; % 2*(loop^2)+1% number of points in x_1-1
+N_1=301; % 2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
 %% Mesh parameters
@@ -152,18 +152,6 @@ for k=1:1
     %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
 end
 
-%% SOLVER without preconditionig
-% c_0 = c_000;
-% for k=1:1
-%     E=E_0(:,k); 
-%     tic;
-%     %[C,st]=CG_solver(A,G_m,c_0,E,steps,toler); % without preconditioning
-%     [C2,st,norm_evol2]=CG_solver(A,G_m,c_0,E,steps,toler,M_m);
-%     T4(k,counter) = toc;
-%     S4(k,counter) = st;
-%     %A_01(:,k)=Hom_parameter(C,A,G_n,E); % Compute homogenized parameter
-% end
-
 %% SOLVER with constant preconditionig
 c_0=c_000;
 for k=1:1
@@ -181,19 +169,15 @@ for k=1:1
     tic;
     E=E_0(:,k);
     %[C,st]=CGP_solver_1f_v3(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
-    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,GG0,GG1,U1,U2); % with better preconditioning
+    [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2); % with better preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     %A_03(:,k)=Hom_parameter(C,A,G_n,E);% Compute homogenized parameter
 end
 %% error 
- % NoP(counter)=N_1*N_2;
    NoP(1,counter)=par;
-
-  % isos(counter)=Pomer12;
-    Kappa(counter,:)=[Min_eig,Max_eig,Max_kappa]
-  counter=counter+1;    
-    
+   Kappa(counter,:)=[Min_eig,Max_eig,Max_kappa]
+  counter=counter+1;      
     
 end
 save('experiment_data/exp3/NoP.mat','NoP');
@@ -211,29 +195,19 @@ save('experiment_data/exp3/T3.mat','T3');
 %end
 %% Plot 
 % Plot steps
-figure 
+ figure 
  hold on
  plot(NoP,S1(1,:),'r')
- %plot(NoP,S1(:,2),'--r')
- 
  plot(NoP,S2(1,:),'b')
- %plot(NoP,S2(:,2),'--b')
-  plot(NoP,S3(1,:),'black')
-% plot(NoP,S3(:,2),'--black')
-%  plot(NoP,S4(1,:),'green')
-
-
+ plot(NoP,S3(1,:),'black')
  legend('G_n','G_m','M_2')
+ 
 % Plot times
  figure 
  hold on
  plot(NoP,T1(1,:),'r')
-% plot(NoP,T1(:,2),'--r')
  plot(NoP,T2(1,:),'b')
-% plot(NoP,T2(:,2),'--b')
-  plot(NoP,T3(1,:),'black')
-% plot(NoP,T3(:,2),'--black')
-%  plot(NoP,T4(1,:),'green')
+ plot(NoP,T3(1,:),'black')
  legend('G_n','G_m','M_2')
  %% Plot A function
  
