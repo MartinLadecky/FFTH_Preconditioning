@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as mticker
 import scipy.io
-
+from matplotlib.lines import Line2D
 def set_pars(mpl):
     mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath,bm,amsfonts}"]
     params = {'text.usetex': True,
@@ -24,6 +25,86 @@ def set_pars(mpl):
 
     return fig_par
 
+n=49
+x= np.arange(1,n+1)
+diag= np.arange(1,n+1)
+diagplus1=np.zeros(n)
+diagminus1=np.zeros(n)
+for i in np.arange(0,n):
+    diagplus1[i] =(i+2)
+    diagminus1[i] =(i)
+    if (i)%7==0:
+        diagminus1[i] = (i+7)*100
+
+    if (i+1)%7==0:
+         diagplus1[i] = (i-5)*100
+downx=np.zeros(7)
+downy=np.zeros(7)
+for i in np.arange(7):
+    downx[i] =i*7+1
+    downy[i]=downx[i]+6
+
+upx = np.zeros(7)
+upy = np.zeros(7)
+for i in np.arange(7):
+    upx[i] = (i+ 1) * 7
+    upy[i] = upx[i] - 6
+
+cubex=np.array([0.5,7.5,7.5,0.5,0.5])
+cubey=np.array([0.5,0.5,7.5,7.5,0.5])
+
+
+fig = plt.figure()
+parf = set_pars(mpl)
+src = './experiments/figures/'  # source folder\
+
+
+plt.figure(num=None, figsize=parf['figsize3D'], dpi=parf['dpi'])
+
+for i in np.arange(7):
+    plt.plot(cubex+7*i,cubey+7*i,'--',color='blue',linewidth=0.5)
+
+plt.plot(x, diag, 'ko', linewidth=0., marker='o', markeredgewidth=1,markersize=2,
+         markerfacecolor='k')
+plt.plot(x, diagplus1, 'ko', linewidth=0., marker='o', markeredgewidth=1,markersize=2,
+         markerfacecolor='k')
+plt.plot(x, diagminus1, 'ko', linewidth=0., marker='o', markeredgewidth=1,markersize=2,
+         markerfacecolor='k')
+
+plt.plot(downx, downy, 'rx', linewidth=0., marker='x', markeredgewidth=1,markersize=2,
+         markerfacecolor='r')
+
+plt.plot(upx, upy, 'rx', linewidth=0., marker='x', markeredgewidth=1,markersize=2,
+         markerfacecolor='r')
+
+# plt.xlabel(r'$\dagger = 10$')
+plt.xlabel(r'(a)')
+ax = plt.gca()
+ax.set_xlim([0, 50])
+ax.set_ylim([0,50])
+plt.gca().invert_yaxis()
+#plt.ticklabel_format(axis='x', style='scientific', scilimits=(0, 0))
+
+
+colors = ['black', 'red', 'green']
+lines = [Line2D([0], [0], linewidth=0., marker='o', markeredgewidth=1,markersize=3,
+         markerfacecolor='k',color='k') ,
+         Line2D([0], [0], linewidth=0., marker='x', markeredgewidth=1, markersize=3,
+                markerfacecolor='r',color='r'),
+         Line2D([0], [0], linestyle='--', linewidth=1., color='blue')
+         ]
+labels = ['non-zero el.', 'outlying non-zero el.', 'diagonal blocks']
+plt.legend(lines, labels)
+
+#plt.legend(loc='best')
+fname = src + 'Sparsity{}'.format('.pdf')
+print(('create figure: {}'.format(fname)))
+plt.savefig(fname, dpi=parf['dpi'], pad_inches=parf['pad_inches'], bbox_inches='tight')
+print('END plot Sparsity')
+
+plt.show()
+
+breakpoint()
 
 
 mat1 = scipy.io.loadmat('Spectra1.mat')
@@ -95,10 +176,6 @@ plt.savefig(fname, dpi=parf['dpi'], pad_inches=parf['pad_inches'], bbox_inches='
 print('END plot Spectra10')
 
 plt.show()
-
-breakpoint()
-
-
 
 
 
