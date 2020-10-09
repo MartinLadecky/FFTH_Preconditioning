@@ -17,6 +17,8 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
+for loop=[9,10,11];%[1,5,10,14,17,19,20]
+N_1=2*loop^2+1% number of points in x_1-1   3^loop
 for loop=[1,5,10,14,17,19,20]
 N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
