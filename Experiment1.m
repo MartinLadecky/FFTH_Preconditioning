@@ -1,4 +1,3 @@
-
 %function [A_0,st,t,Nbf]=Hom_solver(N)
 %% HOMOGENIZATION PROBLEM
 %  sol PDE -div(A(x)grad(u))=div(A(x)E))
@@ -20,6 +19,8 @@ counter=1;
 
 for loop=[9,10,11];%[1,5,10,14,17,19,20]
 N_1=2*loop^2+1% number of points in x_1-1   3^loop
+for loop=[1,5,10,14,17,19,20]
+N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
 
@@ -126,7 +127,7 @@ end
 
 %% Conditions:
 steps =300;
-toler = 1e-10;
+toler = 1e-6;
 c_000=rand(N_2,N_1);
 
 %% SOLVERs with M_0 preconditionig
@@ -180,13 +181,13 @@ title('Norm of residua')
   counter=counter+1;
 end
 %% Save plot data 
-% save('experiment_data/exp1/NoP.mat','NoP');
-% save('experiment_data/exp1/S1.mat','S1');
-% save('experiment_data/exp1/S2.mat','S2');
-% save('experiment_data/exp1/S3.mat','S3');
-% save('experiment_data/exp1/T1.mat','T1');
-% save('experiment_data/exp1/T2.mat','T2');
-% save('experiment_data/exp1/T3.mat','T3');
+save('experiment_data/exp1/NoP.mat','NoP');
+save('experiment_data/exp1/S1.mat','S1');
+save('experiment_data/exp1/S2.mat','S2');
+save('experiment_data/exp1/S3.mat','S3');
+save('experiment_data/exp1/T1.mat','T1');
+save('experiment_data/exp1/T2.mat','T2');
+save('experiment_data/exp1/T3.mat','T3');
 
 NoS1=(1:S1(1,end));
 NoS2=(1:S2(1,end));
@@ -202,6 +203,22 @@ NoS3=(1:S3(1,end));
 % save('experiment_data/expPAMM1/T2.mat','norm_evol2');
 % save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
 
+save('experiment_data/expPAMM1/S1.mat','S1');
+ save('experiment_data/expPAMM1/S2.mat','S2');
+ save('experiment_data/expPAMM1/S3.mat','S3');
+save('experiment_data/expPAMM1/T1.mat','norm_evol1');
+save('experiment_data/expPAMM1/T2.mat','norm_evol2');
+save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
+%% Plot
+%  figure 
+%  hold on
+%  loglog((1:S1(1,end)) ,norm_evol1)
+%  loglog((1:S2(1,end)),norm_evol2)
+% % loglog((1:S22(1,end)),norm_evol22)
+%  loglog((1:S3(1,end)),norm_evol3)
+% set(gca, 'XScale', 'log', 'YScale', 'log');
+% legend('G_n','G_m','M_2')
+
 % Plot steps
 figure 
  hold on
@@ -209,16 +226,19 @@ figure
  plot(NoP,S2(1,:),'b')
  plot(NoP,S3(1,:),'black')
  % plot(NoP,S4(1,:),'black')
- title('Number of steps')
-legend('G','G_m','M_2')
+legend('$\widehat{K}^{\textrm{ref}}_{0}$','$\widehat{K}^{\textrm{ref}}_{1}$','$\widehat{K}^{\textrm{ref}}_{2}$','Interpreter','latex')
+axis([ 0 1e6 0 50])
+%yticks([0 5 10 15 20 25 30])
+%xticklabels({'-3\pi','-2\pi','-\pi','0','\pi','2\pi','3\pi'})
+ylabel('number of iterations')
+xlabel('grid size - $ | | $ ','Interpreter','latex')
+saveas(gcf,'exp1_steps.eps')
 
 % Plot times
- figure 
- hold on
- plot(NoP,T1(1,:),'r')
- plot(NoP,T2(1,:),'b')
- plot(NoP,T3(1,:),'black')
-legend('G','G_m','M_2')
-title('Time')
+%  figure 
+%  hold on
+%  plot(NoP,T1(1,:),'r')
+%  plot(NoP,T2(1,:),'b')
+%  plot(NoP,T3(1,:),'black')
+% legend('$\widehat{K}_{0}$','Interpreter','latex')
  %% Plot A function
- 

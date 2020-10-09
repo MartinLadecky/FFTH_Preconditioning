@@ -1,4 +1,3 @@
-
 %function [A_0,st,t,Nbf]=Hom_solver(N)
 %% HOMOGENIZATION PROBLEM
 %  sol PDE -div(A(x)grad(u))=div(A(x)E))
@@ -18,7 +17,7 @@ A_0=zeros(2,2);
 
 loop1=1;
 counter=1;
-for loop=22;%(1:3:15)%[1,5,10,14,17,19,20,21,22]
+for loop=[1,5,10,14,17,19,20]
 N_1=2*(loop^2)+1% number of points in x_1-1
 N_2=N_1; % number of points in x_2
 
@@ -133,7 +132,7 @@ end
 
 %% Conditions:
 steps = 500;
-toler = 1e-10;
+toler = 1e-6;
 c_000=rand(N_2,N_1);
 %% SOLVERs with M_0 preconditionig
 % Preconditioner incorporated in G matricies
@@ -152,14 +151,10 @@ for k=1:1
     E=E_0(:,k);
     tic;
     [C2,st,norm_evol2]=CG_solver(A,G_m,c_0,E,steps,toler,M_m);
+    %[C22,st,norm_evol2]=CGP_solver_left(A,G,c_0,E,steps,toler,M_f_const);
     T2(k,counter) = toc;
     S2(k,counter) = st;
     A_2(:,k)=Hom_parameter(C2,A,G,E) % Compute homogenized parameter
-   
-%    [C22,st,norm_evol2]=CGP_solver_left(A,G,c_0,E,steps,toler,M_f_const);
-%     T22(k,counter) = toc;
-%     S22(k,counter) = st;
-%    A_22(:,k)=Hom_parameter(C22,A,G,E)
 end
 %% SOLVER with M_2 preconditionig
 c_0=c_000;
@@ -167,26 +162,24 @@ for k=1:1
     E=E_0(:,k);
     tic;
     [C3,st,norm_evol3]=CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2); % with better preconditioning
+    %[C33,st]=CGP_solver_1f_v3(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2);
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
-%     [C33,st]=CGP_solver_1f_v3(A,G_n,c_0,E,steps,toler,GG0,GG1,U1,U2);
-%      T33(k,counter)=toc;
-%     S33(k,counter) = st;
-%     A_33(:,k)=Hom_parameter(C33,A,G_n,E)%
+
 end
 %% error 
   NoP(counter)=N_1*N_2;
   counter=counter+1;
 end
 %% 
-% save('experiment_data/exp2/NoP.mat','NoP');
-% save('experiment_data/exp2/S1.mat','S1');
-% save('experiment_data/exp2/S2.mat','S2');
-% save('experiment_data/exp2/S3.mat','S3');
-% save('experiment_data/exp2/T1.mat','T1');
-% save('experiment_data/exp2/T2.mat','T2');
-% save('experiment_data/exp2/T3.mat','T3'); 
+save('experiment_data/exp2/NoP.mat','NoP');
+save('experiment_data/exp2/S1.mat','S1');
+save('experiment_data/exp2/S2.mat','S2');
+save('experiment_data/exp2/S3.mat','S3');
+save('experiment_data/exp2/T1.mat','T1');
+save('experiment_data/exp2/T2.mat','T2');
+save('experiment_data/exp2/T3.mat','T3'); 
 
 NoS1=(1:S1(1,end));
 NoS2=(1:S2(1,end));
