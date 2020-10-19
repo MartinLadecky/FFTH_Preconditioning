@@ -18,8 +18,8 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=22;%[1,5,10,14,17,19,20]
-N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
+for loop=[9,10,11];%[1,5,10,14,17,19,20]
+N_1=2*loop^2+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
 
@@ -135,7 +135,7 @@ c_0 = c_000;
 for k=1:1 
     E=E_0(:,k);
     tic;
-    [C1,st,norm_evol1]=CG_solver(A,G_n,c_0,E,steps,toler,M_n);
+    [C1,st,norm_evol1]=CG_solver(A,G,c_0,E,steps,toler,M_n);
     T1(k,counter) = toc;
     S1(k,counter) = st;
     A_1(:,k)=Hom_parameter(C1,A,G,E); % Compute homogenized parameter
@@ -165,7 +165,16 @@ for k=1:1
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C3,A,G,E)% Compute homogenized parameter
 end
-
+%% Plot
+ figure 
+ hold on
+ plot((1:S1(1,end)) ,norm_evol1)
+ plot((1:S2(1,end)),norm_evol2)
+% loglog((1:S22(1,end)),norm_evol22)
+ loglog((1:S3(1,end)),norm_evol3)
+set(gca, 'XScale', 'linear', 'YScale', 'log');
+legend('G','G_m','M_2')
+title('Norm of residua')
 %% error 
   NoP(counter)=N_1*N_2;
   counter=counter+1;
@@ -182,25 +191,16 @@ end
 NoS1=(1:S1(1,end));
 NoS2=(1:S2(1,end));
 NoS3=(1:S3(1,end));
-save('experiment_data/expPAMM1/NoS1.mat','NoS1'); 
-save('experiment_data/expPAMM1/NoS2.mat','NoS2');
-save('experiment_data/expPAMM1/NoS3.mat','NoS3');
-
-save('experiment_data/expPAMM1/S1.mat','S1');
- save('experiment_data/expPAMM1/S2.mat','S2');
- save('experiment_data/expPAMM1/S3.mat','S3');
-save('experiment_data/expPAMM1/T1.mat','norm_evol1');
-save('experiment_data/expPAMM1/T2.mat','norm_evol2');
-save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
-%% Plot
- figure 
- hold on
- loglog((1:S1(1,end)) ,norm_evol1)
- loglog((1:S2(1,end)),norm_evol2)
-% loglog((1:S22(1,end)),norm_evol22)
- loglog((1:S3(1,end)),norm_evol3)
-set(gca, 'XScale', 'log', 'YScale', 'log');
-legend('G_n','G_m','M_2')
+% save('experiment_data/expPAMM1/NoS1.mat','NoS1'); 
+% save('experiment_data/expPAMM1/NoS2.mat','NoS2');
+% save('experiment_data/expPAMM1/NoS3.mat','NoS3');
+% 
+% save('experiment_data/expPAMM1/S1.mat','S1');
+%  save('experiment_data/expPAMM1/S2.mat','S2');
+%  save('experiment_data/expPAMM1/S3.mat','S3');
+% save('experiment_data/expPAMM1/T1.mat','norm_evol1');
+% save('experiment_data/expPAMM1/T2.mat','norm_evol2');
+% save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
 
 % Plot steps
 figure 
@@ -209,7 +209,8 @@ figure
  plot(NoP,S2(1,:),'b')
  plot(NoP,S3(1,:),'black')
  % plot(NoP,S4(1,:),'black')
-legend('G_n','G_m','M_2')
+ title('Number of steps')
+legend('G','G_m','M_2')
 
 % Plot times
  figure 
@@ -217,6 +218,7 @@ legend('G_n','G_m','M_2')
  plot(NoP,T1(1,:),'r')
  plot(NoP,T2(1,:),'b')
  plot(NoP,T3(1,:),'black')
-legend('G_n','G_m','M_2')
+legend('G','G_m','M_2')
+title('Time')
  %% Plot A function
  
