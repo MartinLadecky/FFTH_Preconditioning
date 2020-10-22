@@ -104,8 +104,6 @@ print('END plot Sparsity')
 
 plt.show()
 
-breakpoint()
-
 
 mat1 = scipy.io.loadmat('Spectra1.mat')
 Ns = np.arange(mat1['SpectrumRed'].size)
@@ -130,7 +128,7 @@ plt.xlabel(r'$\dagger = 1$')
 plt.ylabel('eigenvalues')
 ax = plt.gca()
 ax.set_xlim([0, 444])
-ax.set_ylim([1e-2,200])
+ax.set_ylim([0,200])
 #plt.ticklabel_format(axis='x', style='scientific', scilimits=(0, 0))
 
 plt.legend(loc='best')
@@ -141,7 +139,7 @@ print('END plot Spectra1')
 
 plt.show()
 
-
+breakpoint()
 
 mat1 = scipy.io.loadmat('Spectra10.mat')
 Ns = np.arange(mat1['SpectrumRed'].size)
