@@ -39,7 +39,7 @@ for st = 1:steps
     u_1 = u_0 + alfa_0*p_0;
     x_1=u_1.*M_m;
     grad_x_1=G.*(x_1);
-    norm_sol(st)=sqrt(scalar_product_grad(grad_x_1,grad_x_1));
+    norm_sol(st)=sqrt(scalar_product_grad_energy(grad_x_1,grad_x_1,A));
     r_1 = r_0 - alfa_0*M_1;
     
     z_1=r_1./(M_m);

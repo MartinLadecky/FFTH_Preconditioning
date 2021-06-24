@@ -54,7 +54,7 @@ function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_pro
         
         c_1 = c_0 + alfa_0.*p_0; % [N_bf2,N_bf1] +  scalar*[N_bf2,N_bf1,2]
 %         c_1((end+1)/2,(end+1)/2,:)=0;
-        norm_sol(st)=sqrt(scalar_product_grad(c_1,c_1));
+        norm_sol(st)=sqrt(scalar_product_grad_energy(c_1,c_1,A));
        % e_norm_error(st)=sqrt(scalar_product_grad_energy(c_1-G.*C_precise.C,c_1-G.*C_precise.C,A));
          %norm_sol(st)=sqrt(scalar_product_grad_energy(c_1,c_1,A));
          %disp('Mean c1')
