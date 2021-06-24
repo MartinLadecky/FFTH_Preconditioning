@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 steps = 500;
-for loop=[14]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+for loop=[7]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -37,7 +37,7 @@ x=zeros(N_2,N_1,2);
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
- %par=100
+ par=10
   
   Min_eig = 100000;
  Max_eig= 0;
@@ -45,8 +45,8 @@ x=zeros(N_2,N_1,2);
   C_ref=zeros(N_2,N_1,2,2); 
   for i=1:N_2
      for j=1:N_1    
-          A(i,j,:,:)=a_matrix(x(i,j,:));%
-          %a_matrix(Pixels(piya(i),pixa(j)));%a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
+          A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
+          %;%a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
          pom = zeros(2);
          pom(1,1) = A(i,j,1,1); pom(1,2) = A(i,j,1,2);
          pom(2,1) = A(i,j,2,1); pom(2,2) = A(i,j,2,2);        
@@ -86,17 +86,12 @@ G_n=G_mean(N_1,N_2,[1 0;0 1]);
 G_m=G_mean(N_1,N_2,d);
 
 %% Preconditioning
-[M_m] = M_mean_half_inv(N_1,N_2,d); %M^-1/2
+[M_m_half_inv] = M_mean_half_inv(N_1,N_2,d); %M^-1/2
 
-M_fGn_const= -(d(1,1).*(G_n(:,:,1).^2)+d(2,2).*(G_n(:,:,2).^2)...
-                   +2*d(1,2).*(G_n(:,:,1).*(G_n(:,:,2))));  
-               
-M_fGn_const((end+1)/2,(end+1)/2)=1;
-
-M_fG_const= -(d(1,1).*(G(:,:,1).^2)+d(2,2).*(G(:,:,2).^2)...
+M_m= -(d(1,1).*(G(:,:,1).^2)+d(2,2).*(G(:,:,2).^2)...
                    +2*d(1,2).*(G(:,:,1).*(G(:,:,2))));  
                
-M_fG_const((end+1)/2,(end+1)/2)=1;
+M_m((end+1)/2,(end+1)/2)=1;
 
 %% Conditions:
 tau=0.25
@@ -111,14 +106,29 @@ disp('Projection based solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [Cp,st,norm_evolp, estimp, delayp, sol_normp]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_fG_const,d,tau,G_m,C_ref_inv);
+    [Cp,st,norm_evolp, estimp, delayp, sol_normp]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
     %sol_normp
-    mean_proj=mean(mean(fftshift(ifft2(ifftshift(Cp)))))
+    %mean_proj=mean(mean(fftshift(ifft2(ifftshift(Cp)))));
     norm_evolp;
     Tp(k,counter) = toc;
     Sp(k,counter) = st;
     A_p(:,k)=Hom_parameter_grad(Cp,A,G,E) % Compute homogenized parameter
     Ap(counter)=A_p(1,1);
+end
+
+%% Projection based solver: modified with C_ref 
+c_0 = c_000;
+
+disp('Projection based solver: modified with C_ref ')
+for k=1:1
+    E=E_0(:,k); 
+    tic;
+    [Cp,st,norm_evolpc, estimpc, delaypc, sol_normpc]=solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
+    norm_evolp;
+    Tpc(k,counter) = toc;
+    Spc(k,counter) = st;
+    A_pc(:,k)=Hom_parameter_grad(Cp,A,G,E) % Compute homogenized parameter
+    Apc(counter)=A_pc(1,1);
 end
 
 %% SOLVER with constant preconditionig from left grad error measure
@@ -127,7 +137,7 @@ disp('SOLVER with constant preconditionig from left hand side ::: grad error mea
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
+    [C,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
     %sol_normg
     Tg(k,counter)=toc;
     Sg(k,counter) = st;
@@ -142,7 +152,7 @@ c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evols,sol_norms]=solver_PCG_symPrec_grad_norm(A,G,c_0,E,steps,toler,M_m);
+    [C,st,norm_evols,sol_norms]=solver_PCG_symPrec_grad_norm(A,G,c_0,E,steps,toler,M_m_half_inv);
     norm_evols;
     mean_sym=mean(mean(fftshift(ifft2(ifftshift(G.*C)))))
     Ts(k,counter) = toc;
@@ -159,7 +169,7 @@ c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evol1]=solver_CG_Gn(A,G_m,c_0,E,steps,toler,M_m);
+    [C,st,norm_evol1]=solver_CG_Gn(A,G_m,c_0,E,steps,toler,M_m_half_inv);
     T1(k,counter) = toc;
     S1(k,counter) = st;
     A_1(:,k)=Hom_parameter(C,A,G,E) % Compute homogenized parameter
@@ -174,7 +184,7 @@ c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evol2]=solver_PCG_symPrec(A,G,c_0,E,steps,toler,M_m);
+    [C,st,norm_evol2]=solver_PCG_symPrec(A,G,c_0,E,steps,toler,M_m_half_inv);
 
     T2(k,counter) = toc;
     S2(k,counter) = st;
@@ -189,7 +199,7 @@ disp('SOLVER with constant preconditionig from left hand side')
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evol3, estim3, delay3]=solver_PCG_left(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
+    [C,st,norm_evol3, estim3, delay3]=solver_PCG_left(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
@@ -227,11 +237,12 @@ title('Energetic norm estimates')
 %% Plot residuals
  figure 
  hold on
- plot((1:S1(1,end)) ,norm_evol1,'-.')
+ plot((1:S1(1,end)) ,norm_evol1,'*')
  plot((1:S2(1,end)),norm_evol2,'--')
- plot((1:S3(1,end)),norm_evol3,'.')
+ plot((1:S3(1,end)),norm_evol3,'o')
  
   plot((1:Sp(1,end)),norm_evolp,'*')
+  plot((1:Spc(1,end)),norm_evolpc,'*')
   plot((1:Sg(1,end)),norm_evolg,'>')
    plot((1:Ss(1,end)),norm_evols,'o')
   
@@ -240,7 +251,7 @@ title('Energetic norm estimates')
   %plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'--b')
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('in G','Symetric','Left','proj','grad_norm','sym grad norm','estim3')
+legend('in G','Symetric','Left','proj','proj modif','grad norm','sym grad norm','estim3')
 title('Residuals')
 %% Plot solution norm
  figure 
@@ -263,7 +274,7 @@ title('solution norm')
  plot((1:Ss(1,end)),sol_norms./sol_norms(1),'-.^')
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('sol_norm_proj','sol_norm_grad','sol_norm_Sym')
+legend('sol norm proj','sol norm grad','sol norm Sym')
 
 
 %% Plot steps
@@ -275,7 +286,7 @@ figure
  plot(NoP,S3(1,:),'^')
  plot(NoP,Sp,'-.*')
     plot(NoP,Sg,'-.^') 
-legend('in G','Symetric','Left','proj','grad_norm')
+legend('in G','Symetric','Left','proj','grad norm')
 %% Plot hom_mat prop
 A_refer=2.092740715793266;
 figure 
@@ -285,7 +296,7 @@ figure
  plot(NoP,A_refer-real(A3)','^')
  plot(NoP,A_refer-real(Ap)','-.*')
  plot(NoP,A_refer-real(Ag)','-.^') 
-legend('in G','Symetric','Left','proj','grad_norm')
+legend('in G','Symetric','Left','proj','grad norm')
  
 figure 
  hold on
@@ -294,15 +305,9 @@ figure
  plot(NoP,imag(A3)','^')
  plot(NoP,imag(Ap)','-.*')
  plot(NoP,imag(Ag)','-.^') 
-legend('in G','Symetric','Left','proj','grad_norm')
+legend('in G','Symetric','Left','proj','grad norm')
 
-% Plot times
-%  figure 
-%  hold on
-%  plot(NoP,T1(1,:),'r')
-%  plot(NoP,T2(1,:),'b')
-%  plot(NoP,T3(1,:),'black')
-% legend('in G','Symetric','Left')
+
 close all
 
  %% Plot A function

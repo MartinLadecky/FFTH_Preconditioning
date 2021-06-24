@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_projection_left(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
+function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
     %% input
     % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
     % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
@@ -20,22 +20,21 @@ function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_pro
      % Gradient in real space
     
     
-    M_0 = Projection(A,grad_c_0,G,C_ref,M_f); % Projection*Material*grad
-    b_0 = Projection_rhs(A,E,G,C_ref,M_f); % Right hand side vector
+    M_0 = Projection_Cref(A,grad_c_0,G,C_ref,M_f); % Projection*Material*grad
+    b_0 = Projection_rhs_Cref(A,E,G,C_ref,M_f); % Right hand side vector
 
     r_0 = b_0-M_0; % x_0=0 
 
     
     %nr0=sqrt(scalar_product_grad(r_0,r_0));
 
-%     Fr_0=fftshift(ifft2(ifftshift(r_0)));
-% 
-%     CFr_0=cat(3,C_ref_inv(:,:,1,1).*Fr_0(:,:,1)+C_ref_inv(:,:,1,2).*Fr_0(:,:,2),...
-%             C_ref_inv(:,:,2,1).*Fr_0(:,:,1)+C_ref_inv(:,:,2,2).*Fr_0(:,:,2));
-%     z_0=fftshift(fft2(ifftshift(CFr_0)));    
+    Fr_0=fftshift(ifft2(ifftshift(r_0)));
+
+    CFr_0=cat(3,C_ref_inv(:,:,1,1).*Fr_0(:,:,1)+C_ref_inv(:,:,1,2).*Fr_0(:,:,2),...
+            C_ref_inv(:,:,2,1).*Fr_0(:,:,1)+C_ref_inv(:,:,2,2).*Fr_0(:,:,2));
+    z_0=fftshift(fft2(ifftshift(CFr_0)));    
         
     %z_0 = r_0./C_ref_full; %gradient of z_0, precon is incorp. in the projection
-     z_0=r_0;
     nz0=sqrt(scalar_product_grad(z_0,z_0));
     p_0 = z_0;
     
@@ -43,7 +42,7 @@ function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_pro
     d=0;
     C_precise=load('experiment_data/sol_10_10.mat');
     for st = 1:steps
-        Ap_0 = Projection(A,p_0,G,C_ref,M_f);%LHS_freq(A,p_0,G); 
+        Ap_0 = Projection_Cref(A,p_0,G,C_ref,M_f);%LHS_freq(A,p_0,G); 
         %alfa_0 = real(sum(sum((z_0.')'.*r_0))/sum(sum((p_0.')'.*Ap_0)));
 %         disp('Mean grad_FAp_0')
 %         mean(mean(fftshift(ifft2(ifftshift(Ap_0)))))
@@ -64,12 +63,12 @@ function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_pro
 % %         
         r_1 = r_0 - alfa_0*Ap_0 ;
         
-        z_1=r_1;
-%         Fr_1=fftshift(ifft2(ifftshift(r_1)));
-% 
-%         CFr_1=cat(3,C_ref_inv(:,:,1,1).*Fr_1(:,:,1)+C_ref_inv(:,:,1,2).*Fr_1(:,:,2),...
-%             C_ref_inv(:,:,2,1).*Fr_1(:,:,1)+C_ref_inv(:,:,2,2).*Fr_1(:,:,2));
-%         z_1=fftshift(fft2(ifftshift(CFr_1)));
+        %z_1=r_1;
+        Fr_1=fftshift(ifft2(ifftshift(r_1)));
+
+        CFr_1=cat(3,C_ref_inv(:,:,1,1).*Fr_1(:,:,1)+C_ref_inv(:,:,1,2).*Fr_1(:,:,2),...
+            C_ref_inv(:,:,2,1).*Fr_1(:,:,1)+C_ref_inv(:,:,2,2).*Fr_1(:,:,2));
+        z_1=fftshift(fft2(ifftshift(CFr_1)));
         
         nz1=sqrt(scalar_product_grad(z_1,z_1));
         norm_evol(st)=nz1/nz0;
