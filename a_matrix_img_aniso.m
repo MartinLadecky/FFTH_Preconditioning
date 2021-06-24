@@ -10,5 +10,5 @@ end
 
 
   kappapom=max(eig(a))/min(eig(a));
- eigenos=eig(a)
+ eigenos=eig(a);
 end

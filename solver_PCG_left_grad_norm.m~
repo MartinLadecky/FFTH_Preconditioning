@@ -36,15 +36,15 @@ function [c_1,st,norm_evol, estim, delay,norm_sol,e_norm_error] = solver_PCG_lef
     for st = 1:steps
         Ap_0 = LHS_freq(A,p_0,G);
 
-        z_0r_0= sum(sum((z_0.')'.*r_0));
-        p_0Ap_0=sum(sum((p_0.')'.*Ap_0));
+        z_0r_0=scalar_product(z_0,r_0);
+        p_0Ap_0=scalar_product(p_0,Ap_0);
         
         alfa_0=z_0r_0/p_0Ap_0 ;% new
 
         c_1 = c_0 + alfa_0.*p_0;
 
-            grad_Mc_1=G.*(c_1);
-            norm_sol(st)=sqrt(scalar_product_grad_energy(grad_Mc_1,grad_Mc_1,A));
+        grad_Mc_1=G.*(c_1);
+        norm_sol(st)=sqrt(scalar_product_grad(grad_Mc_1,grad_Mc_1));
 
         r_1 = r_0-alfa_0*Ap_0;
  
@@ -61,7 +61,7 @@ function [c_1,st,norm_evol, estim, delay,norm_sol,e_norm_error] = solver_PCG_lef
                 %add_one=1;
             end  
             
-        z_1r_1=scalar_product(z_1,r_1);
+        z_1r_1=scalar_product(z_1,z_1);
         
         beta_1=z_1r_1/z_0r_0;
         p_1 = z_1 + beta_1*p_0;

@@ -15,10 +15,10 @@ tic
 E_0=[1 0;0 1];
 A_0=zeros(2,2);
 
-loop1=1;
+
 counter=1;
 steps = 500;
-for loop=[7]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+for loop=[15]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -37,7 +37,7 @@ x=zeros(N_2,N_1,2);
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
- par=10
+ par=1000
   
   Min_eig = 100000;
  Max_eig= 0;
@@ -108,7 +108,6 @@ for k=1:1
     tic;
     [Cp,st,norm_evolp, estimp, delayp, sol_normp]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
     %sol_normp
-    %mean_proj=mean(mean(fftshift(ifft2(ifftshift(Cp)))));
     norm_evolp;
     Tp(k,counter) = toc;
     Sp(k,counter) = st;
@@ -123,13 +122,14 @@ disp('Projection based solver: modified with C_ref ')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [Cp,st,norm_evolpc, estimpc, delaypc, sol_normpc]=solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
+    [Cpc,st,norm_evolpc, estimpc, delaypc, sol_normpc]=solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
     norm_evolp;
     Tpc(k,counter) = toc;
     Spc(k,counter) = st;
-    A_pc(:,k)=Hom_parameter_grad(Cp,A,G,E) % Compute homogenized parameter
+    A_pc(:,k)=Hom_parameter_grad(Cpc,A,G,E) % Compute homogenized parameter
     Apc(counter)=A_pc(1,1);
 end
+
 
 %% SOLVER with constant preconditionig from left grad error measure
 c_0=c_000;
@@ -137,11 +137,11 @@ disp('SOLVER with constant preconditionig from left hand side ::: grad error mea
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
+    [Cg,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
     %sol_normg
     Tg(k,counter)=toc;
     Sg(k,counter) = st;
-    A_g(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
+    A_g(:,k)=Hom_parameter(Cg,A,G,E)% Compute homogenized parameter
     Ag(counter)=A_g(1,1);
     
 end
@@ -215,25 +215,25 @@ end
   counter=counter+1;
 end
 
-%% Plot estimates
-rel_estim3=estim3./estim3(1);
-rel_estimg=estimg./estimg(1);
-rel_estimp=estimp./estimp(1);
-
- figure 
- hold on
-  plot((1:numel(estim3)),abs(rel_estim3),'.')
-  plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'.') 
-  
- plot((1:numel(estimg)),abs(rel_estimg),'--x')
-  plot((1:numel(estimg)),abs(rel_estimg./(1-tau)),'--x')
-  
-  plot((1:numel(estimp)),abs(rel_estimp),'--o')
-  plot((1:numel(estimp)),abs(rel_estimp./(1-tau)),'--o')
-  
-set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('rel estim3 lower','rel estim3 upper','rel estimg lower','rel estimg upper','rel estimp lower','rel estimp upper')
-title('Energetic norm estimates')
+% % Plot estimates
+% rel_estim3=estim3./estim3(1);
+% rel_estimg=estimg./estimg(1);
+% rel_estimp=estimp./estimp(1);
+% 
+%  figure 
+%  hold on
+%   plot((1:numel(estim3)),abs(rel_estim3),'.')
+%   plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'.') 
+%   
+%  plot((1:numel(estimg)),abs(rel_estimg),'--x')
+%   plot((1:numel(estimg)),abs(rel_estimg./(1-tau)),'--x')
+%   
+%   plot((1:numel(estimp)),abs(rel_estimp),'--o')
+%   plot((1:numel(estimp)),abs(rel_estimp./(1-tau)),'--o')
+%   
+% set(gca, 'XScale', 'linear', 'YScale', 'log');
+% legend('rel estim3 lower','rel estim3 upper','rel estimg lower','rel estimg upper','rel estimp lower','rel estimp upper')
+% title('Energetic norm estimates')
 %% Plot residuals
  figure 
  hold on
@@ -246,36 +246,34 @@ title('Energetic norm estimates')
   plot((1:Sg(1,end)),norm_evolg,'>')
    plot((1:Ss(1,end)),norm_evols,'o')
   
-  
-  %plot((1:numel(estim3)),abs(rel_estim3),'--r')
-  %plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'--b')
-  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('in G','Symetric','Left','proj','proj modif','grad norm','sym grad norm','estim3')
 title('Residuals')
-%% Plot solution norm
+%% Plot solution difference
  figure 
  hold on
- plot((1:Sp(1,end)),abs(sol_normp-sol_normg),'-.*')
- plot((1:Ss(1,end)),abs(sol_normp(1,end-1)-sol_norms),'-.o')
+ %plot((1:Sp(1,end)),abs(sol_normp-sol_normg),'-.*')
+% plot((1:Ss(1,end)),abs(sol_normp(1,end-1)-sol_norms),'-.o')
+ %
  %plot((1:Ss(1,end)),abs(sol_norms-sol_normg(1,end-1)),'-.^')
  % plot((1:Sg(1,end)),sol_normg,'-.^')
  %plot((1:Sp(1,end)),abs(norm_evolp-norm_evolg),'-.*')
-  
+
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('sol_norm  proj- grad ','sol_norm proj - sym')
-title('solution norm')
+title('solution difference')
 %% Plot solution norm
 
  figure 
  hold on
- plot((1:Sp(1,end)),sol_normp./sol_normp(1),'-.*')
- plot((1:Sg(1,end)),sol_normg./sol_normg(1),'-.o')
- plot((1:Ss(1,end)),sol_norms./sol_norms(1),'-.^')
+ plot((1:Sp(1,end)),sol_normp,'-.*')
+  plot((1:Spc(1,end)),sol_normpc,'-.b')
+ plot((1:Sg(1,end)),sol_normg,'-.o')
+ plot((1:Ss(1,end)),sol_norms,'-.^')
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('sol norm proj','sol norm grad','sol norm Sym')
-
+legend('proj','proj Cref','left grad','sym grad')
+title('solution norm')
 
 %% Plot steps
 
@@ -287,25 +285,29 @@ figure
  plot(NoP,Sp,'-.*')
     plot(NoP,Sg,'-.^') 
 legend('in G','Symetric','Left','proj','grad norm')
+title(' Number of steps')
 %% Plot hom_mat prop
-A_refer=2.092740715793266;
+A_refer=real(A1);%9.403399951113226;
 figure 
  hold on
- plot(NoP,A_refer-real(A1)','x')
- plot(NoP,A_refer-real(A2)','o')
- plot(NoP,A_refer-real(A3)','^')
- plot(NoP,A_refer-real(Ap)','-.*')
- plot(NoP,A_refer-real(Ag)','-.^') 
-legend('in G','Symetric','Left','proj','grad norm')
- 
-figure 
- hold on
- plot(NoP,imag(A1)','x')
- plot(NoP,imag(A2)','o')
- plot(NoP,imag(A3)','^')
- plot(NoP,imag(Ap)','-.*')
- plot(NoP,imag(Ag)','-.^') 
-legend('in G','Symetric','Left','proj','grad norm')
+ plot(NoP,abs(A_refer-real(A1))','x')
+ plot(NoP,abs(A_refer-real(A2))','o')
+ plot(NoP,abs(A_refer-real(A3))','^')
+ plot(NoP,abs(A_refer-real(Ap))','-.*')
+ plot(NoP,abs(A_refer-real(Apc))','-.>') 
+ plot(NoP,abs(A_refer-real(Ag))','-.^') 
+ set(gca, 'XScale', 'linear', 'YScale', 'log');
+
+legend('in G','Symetric','Left','proj','proj mod','grad norm')
+ title(' Hom parameter error')
+% figure 
+%  hold on
+%  plot(NoP,imag(A1)','x')
+%  plot(NoP,imag(A2)','o')
+%  plot(NoP,imag(A3)','^')
+%  plot(NoP,imag(Ap)','-.*')
+%  plot(NoP,imag(Ag)','-.^') 
+% legend('in G','Symetric','Left','proj','grad norm')
 
 
 close all
