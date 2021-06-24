@@ -17,9 +17,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 
-for loop=[9,10,11];%[1,5,10,14,17,19,20]
-N_1=2*loop^2+1% number of points in x_1-1   3^loop
-for loop=[1,5,10,14,17,19,20]
+for loop=[1,2,3,4,5,10,11,12]%[1,5,10,14,17,19,20]
 N_1=2*(loop^2)+1% number of points in x_1-1   3^loop
 
 N_2=N_1; % number of points in x_2
@@ -181,6 +179,10 @@ title('Norm of residua')
   counter=counter+1;
 end
 %% Save plot data 
+if ~exist('experiment_data/exp1', 'dir')
+       mkdir('experiment_data/exp1')
+end
+
 save('experiment_data/exp1/NoP.mat','NoP');
 save('experiment_data/exp1/S1.mat','S1');
 save('experiment_data/exp1/S2.mat','S2');
@@ -192,16 +194,12 @@ save('experiment_data/exp1/T3.mat','T3');
 NoS1=(1:S1(1,end));
 NoS2=(1:S2(1,end));
 NoS3=(1:S3(1,end));
-% save('experiment_data/expPAMM1/NoS1.mat','NoS1'); 
-% save('experiment_data/expPAMM1/NoS2.mat','NoS2');
-% save('experiment_data/expPAMM1/NoS3.mat','NoS3');
-% 
-% save('experiment_data/expPAMM1/S1.mat','S1');
-%  save('experiment_data/expPAMM1/S2.mat','S2');
-%  save('experiment_data/expPAMM1/S3.mat','S3');
-% save('experiment_data/expPAMM1/T1.mat','norm_evol1');
-% save('experiment_data/expPAMM1/T2.mat','norm_evol2');
-% save('experiment_data/expPAMM1/T3.mat','norm_evol3'); 
+if ~exist('experiment_data/expPAMM1', 'dir')
+       mkdir('experiment_data/expPAMM1')
+end
+save('experiment_data/expPAMM1/NoS1.mat','NoS1'); 
+save('experiment_data/expPAMM1/NoS2.mat','NoS2');
+save('experiment_data/expPAMM1/NoS3.mat','NoS3');
 
 save('experiment_data/expPAMM1/S1.mat','S1');
  save('experiment_data/expPAMM1/S2.mat','S2');

@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol] = CG_solver(A,G_n,c_0,E,steps,toler,M_m)
+function [c_1,st,norm_evol] = CG_solver(A,G_n,c_0,E,steps,toler,M_m,G_plain)
 %% input
 % A   [N_bf2,N_bf1,2,2]- matrix of material parameters in every point of grid
 % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
@@ -21,6 +21,12 @@ r_0 = b_0-M_0; %
 
 %nr0 = norm(r_0.*(M_m.^-2).*r_0,'fro');
 nr0 = sqrt(sum(sum(abs(r_0.*(M_m.^-2).*r_0))));
+% z_0 = r_0;%./M_f;
+% 
+% grad_z_0=G_plain.*(z_0);
+% nr0 =sqrt(scalar_product_grad(grad_z_0,grad_z_0))
+
+
 
 p_0 = r_0;
 for st = 1:steps
@@ -28,7 +34,11 @@ for st = 1:steps
     M_1 = LHS_freq(A,p_0,G_n);
     alfa_0 =sum(sum((r_0.')'.*r_0))/sum(sum((p_0.')'.*M_1));
     x_1 = c_1 + alfa_0*p_0;
+   
     r_1 = r_0 - alfa_0*M_1;
+    
+%     grad_Mr_1=G_plain.*(r_1);
+%     norm_evol(st)=sqrt(scalar_product_grad(grad_Mr_1,grad_Mr_1))/nr0;
     norm_evol(st)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;  %sum(sum(r_1.*(M_m.^-2).*r_1))/nr0;
                     
     if ( norm_evol(st)<toler)

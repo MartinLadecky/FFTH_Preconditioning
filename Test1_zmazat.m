@@ -58,23 +58,25 @@ for i=1:N_bf
 end
 Gn((N_1+1)/2,(N_1+1)/2,:)=0;
 
-Gn*(Gn')
+Gamma=Gn*(Gn')
 
 Project((N_1+1)/2,(N_1+1)/2,:)=0;
 
-
+%% 
  %AA=F*a'
  Fa=fftshift(fft(ifftshift(a')));
 % a_hat=fft(ifftshift(a'))
  
  %LargeFa = reshape([Fa'; zeros(size(Fa'))],[],1);
  %Fa(2*numel(Fa)-1)=0
-LargeFa=2.*[zeros(1,(numel(Fa)-1)/2),Fa',zeros(1,(numel(Fa)-1)/2)];
+LargeFa=2.*[zeros(1,(numel(Fa)-1)/2),Fa',zeros(1,(numel(Fa)-1)/2)]
 
  
  La=fftshift(ifft(ifftshift(LargeFa')))
  a 
  %In*A*In'
+ figure 
  plot(x,a)
  hold on
  plot(x_bar,La)
+ 

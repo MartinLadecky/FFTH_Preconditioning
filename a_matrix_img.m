@@ -1,5 +1,5 @@
 function a=a_matrix_img(pix)
-if pix < 130
+if pix < 100
     a =[0.01 ,   0.005;...
         0.005 ,   0.01];
 

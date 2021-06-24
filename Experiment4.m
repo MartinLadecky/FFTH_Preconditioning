@@ -90,6 +90,7 @@ M_fG_const((end+1)/2,(end+1)/2)=-1;
 steps = 300;
 toler = 1e-6;
 c_000=rand(N_2,N_1);
+tau=0.24
 %% SOLVER without preconditionig and G
 c_0 = c_000;
 for k=1:1
@@ -117,7 +118,7 @@ c_0=c_000;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evol3]=CGP_solver_left(A,G,c_0,E,steps,toler,M_fG_const);% with preconditioning
+    [C,st,norm_evol3]=CGP_solver_left(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C,A,G,E);% Compute homogenized parameter
@@ -140,8 +141,8 @@ end
 
  figure 
  hold on
- plot((1:S1(1,end)) ,norm_evol1)
- plot((1:S2(1,end)),norm_evol2)
+ plot((1:S1(1,end)) ,norm_evol1,'x')
+ plot((1:S2(1,end)),norm_evol2,'o')
  plot((1:S3(1,end)),norm_evol3)
 set(gca, 'XScale', 'log', 'YScale', 'log');
 legend('in G','Symetric','Left')
