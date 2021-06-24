@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = CGP_projection_left(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
+function [c_1,st,norm_evol, estim, delay, norm_sol,e_norm_error] = solver_GP_projection_left(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
     %% input
     % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
     % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative

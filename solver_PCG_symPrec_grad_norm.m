@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol,norm_sol] = CG_solver_symPrec_grad(A,G,c_0,E,steps,toler,M_m)
+function [c_1,st,norm_evol,norm_sol] = solver_PCG_symPrec_grad_norm(A,G,c_0,E,steps,toler,M_m)
 %% input
 % A   [N_bf2,N_bf1,2,2]- matrix of material parameters in every point of grid
 % G_i [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative with incorporated preconditioner M.^(-1/2) from both sides

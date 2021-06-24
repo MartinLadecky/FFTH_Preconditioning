@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol] = CGP_solver_1f_left(A,G,c_0,E,steps,toler,U1,U2)
+function [c_1,st,norm_evol] = solver_PCG_1f_left(A,G,c_0,E,steps,toler,U1,U2)
 %% input
 % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
 % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
