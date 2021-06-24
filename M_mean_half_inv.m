@@ -1,12 +1,9 @@
-function [M] = M_mean(N_bf1,N_bf2,C)
+function [M] = M_mean_half_inv(N_bf1,N_bf2,C)
 %% Input
 % N_bf1 []- Number of bf in x dir,
 % N_bf2 []- Number of bf in y dir,
 %% Output
-% G_n -Matrix of coeficients of 1st derivative 
-%       saved in "meshgrid size" 
-% G_n [:,:,1]- der in x direction
-% G_n [:,:,2]- der in y direction
+% M - Mean value preconditioner (D^t C_ref D)^-1/2
 %% 
 [m(:,:,1),m(:,:,2)] =meshgrid(-(N_bf1-1)/2:(N_bf1-1)/2,...
                               -(N_bf2-1)/2:(N_bf2-1)/2);

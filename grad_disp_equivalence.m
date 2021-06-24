@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 loop1=1;
 counter=1;
 steps = 500;
-for loop=[8]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+for loop=[14]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -33,11 +33,11 @@ x=zeros(N_2,N_1,2);
 
 %% Material coeficient matrix
 
- Pixels = imread('structure_3.png');
+ Pixels = imread('structure_4.png');
 
  pixa=round(linspace(1,size(Pixels,2),N_1));
  piya=round(linspace(1,size(Pixels,1),N_2));
- 
+ %par=100
   
   Min_eig = 100000;
  Max_eig= 0;
@@ -45,7 +45,8 @@ x=zeros(N_2,N_1,2);
   C_ref=zeros(N_2,N_1,2,2); 
   for i=1:N_2
      for j=1:N_1    
-          A(i,j,:,:)=a_matrix_img(Pixels(piya(i),pixa(j)));%a_matrix(x(i,j,:));%
+          A(i,j,:,:)=a_matrix(x(i,j,:));%
+          %a_matrix(Pixels(piya(i),pixa(j)));%a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
          pom = zeros(2);
          pom(1,1) = A(i,j,1,1); pom(1,2) = A(i,j,1,2);
          pom(2,1) = A(i,j,2,1); pom(2,2) = A(i,j,2,2);        
@@ -80,12 +81,12 @@ for i=1:N_2
 end
 
 %% Derivatives
-G=G_clasic(N_1,N_2);
-G_n=G_matrix(N_1,N_2);
+G = G_clasic(N_1,N_2);
+G_n=G_mean(N_1,N_2,[1 0;0 1]);
 G_m=G_mean(N_1,N_2,d);
 
 %% Preconditioning
-[M_m] = M_mean(N_1,N_2,d); %M^-1/2
+[M_m] = M_mean_half_inv(N_1,N_2,d); %M^-1/2
 
 M_fGn_const= -(d(1,1).*(G_n(:,:,1).^2)+d(2,2).*(G_n(:,:,2).^2)...
                    +2*d(1,2).*(G_n(:,:,1).*(G_n(:,:,2))));  
@@ -102,9 +103,6 @@ tau=0.25
 toler = 1e-6;
 c_000=zeros(N_2,N_1);
 
-%c_000=c_000-mean(mean(c_000));
-
-
 
 %% Projection based solver
 c_0 = c_000;
@@ -113,7 +111,7 @@ disp('Projection based solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [Cp,st,norm_evolp, estimp, delayp, sol_normp]=CGP_projection_left(A,G,c_0,E,steps,toler,M_fG_const,d,tau,G_m,C_ref_inv);
+    [Cp,st,norm_evolp, estimp, delayp, sol_normp]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_fG_const,d,tau,G_m,C_ref_inv);
     %sol_normp
     mean_proj=mean(mean(fftshift(ifft2(ifftshift(Cp)))))
     norm_evolp;
@@ -129,9 +127,8 @@ disp('SOLVER with constant preconditionig from left hand side ::: grad error mea
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evolg, estimg, delayg, sol_normg]=CGP_solver_left_grad(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
+    [C,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
     %sol_normg
-    mean_grad=mean(mean(fftshift(ifft2(ifftshift(G.*C)))))
     Tg(k,counter)=toc;
     Sg(k,counter) = st;
     A_g(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
@@ -139,20 +136,13 @@ for k=1:1
     
 end
 
-    %grad_proj=fftshift(ifft2(ifftshift(Cp)));
-    %grad_disp=fftshift(ifft2(ifftshift(G.*C))); %G.*(C./M_fG_const)
-%     grad_proj_mean=mean(mean(grad_proj))
-%     grad_disp_mean=mean(mean(grad_disp))
-
-
-
 %% SOLVER with symetric preconditionig M and G
 disp('SOLVER with symetric preconditionig M and G,::: grad error measure')
 c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evols,sol_norms]=CG_solver_symPrec_grad(A,G,c_0,E,steps,toler,M_m);
+    [C,st,norm_evols,sol_norms]=solver_PCG_symPrec_grad_norm(A,G,c_0,E,steps,toler,M_m);
     norm_evols;
     mean_sym=mean(mean(fftshift(ifft2(ifftshift(G.*C)))))
     Ts(k,counter) = toc;
@@ -169,7 +159,7 @@ c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evol1]=CG_solver(A,G_m,c_0,E,steps,toler,M_m,G);
+    [C,st,norm_evol1]=solver_CG_Gn(A,G_m,c_0,E,steps,toler,M_m);
     T1(k,counter) = toc;
     S1(k,counter) = st;
     A_1(:,k)=Hom_parameter(C,A,G,E) % Compute homogenized parameter
@@ -184,7 +174,7 @@ c_0 = c_000;
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C,st,norm_evol2]=CG_solver_symPrec(A,G,c_0,E,steps,toler,M_m);
+    [C,st,norm_evol2]=solver_PCG_symPrec(A,G,c_0,E,steps,toler,M_m);
 
     T2(k,counter) = toc;
     S2(k,counter) = st;
@@ -199,7 +189,7 @@ disp('SOLVER with constant preconditionig from left hand side')
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evol3, estim3, delay3]=CGP_solver_left(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
+    [C,st,norm_evol3, estim3, delay3]=solver_PCG_left(A,G,c_0,E,steps,toler,M_fG_const,tau);% with preconditioning
     T3(k,counter)=toc;
     S3(k,counter) = st;
     A_3(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
@@ -214,15 +204,6 @@ end
   NoP(counter)=N_1*N_2;
   counter=counter+1;
 end
-%% 
-
-%save('experiment_data/sol_10_10.mat','C');
-% save('experiment_data/exp2/S1.mat','S1');
-% save('experiment_data/exp2/S2.mat','S2');
-% save('experiment_data/exp2/S3.mat','S3');
-% save('experiment_data/exp2/T1.mat','T1');
-% save('experiment_data/exp2/T2.mat','T2');
-% save('experiment_data/exp2/T3.mat','T3'); 
 
 %% Plot estimates
 rel_estim3=estim3./estim3(1);
@@ -242,6 +223,7 @@ rel_estimp=estimp./estimp(1);
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('rel estim3 lower','rel estim3 upper','rel estimg lower','rel estimg upper','rel estimp lower','rel estimp upper')
+title('Energetic norm estimates')
 %% Plot residuals
  figure 
  hold on
@@ -259,7 +241,7 @@ legend('rel estim3 lower','rel estim3 upper','rel estimg lower','rel estimg uppe
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('in G','Symetric','Left','proj','grad_norm','sym grad norm','estim3')
-
+title('Residuals')
 %% Plot solution norm
  figure 
  hold on
@@ -271,7 +253,7 @@ legend('in G','Symetric','Left','proj','grad_norm','sym grad norm','estim3')
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('sol_norm  proj- grad ','sol_norm proj - sym')
-
+title('solution norm')
 %% Plot solution norm
 
  figure 

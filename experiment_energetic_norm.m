@@ -82,7 +82,7 @@ G_n=G_matrix(N_1,N_2);
 G_m=G_mean(N_1,N_2,d);
 
 %% Preconditioning
-[M_m] = M_mean(N_1,N_2,d);
+[M_m] = M_mean_half_inv(N_1,N_2,d);
 
 M_fGn_const= -(d(1,1).*(G_n(:,:,1).^2)+d(2,2).*(G_n(:,:,2).^2)...
                    +2*d(1,2).*(G_n(:,:,1).*(G_n(:,:,2))));  
