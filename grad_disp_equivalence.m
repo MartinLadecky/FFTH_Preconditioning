@@ -18,7 +18,7 @@ A_0=zeros(2,2);
 
 counter=1;
 steps = 500;
-for loop=[15]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+for loop=[10]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -46,7 +46,7 @@ x=zeros(N_2,N_1,2);
   for i=1:N_2
      for j=1:N_1    
           A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
-          %;%a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%a_matrix(x(i,j,:));%
+          %;%a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);%;%
          pom = zeros(2);
          pom(1,1) = A(i,j,1,1); pom(1,2) = A(i,j,1,2);
          pom(2,1) = A(i,j,2,1); pom(2,2) = A(i,j,2,2);        
@@ -110,7 +110,10 @@ for k=1:1
     %sol_normp
     norm_evolp;
     Tp(k,counter) = toc;
-    Sp(k,counter) = st;
+         stepses=size(norm_evolp);
+
+    Sp(k,counter) = stepses(2);
+  %  Sp(k,counter) = st+1;
     A_p(:,k)=Hom_parameter_grad(Cp,A,G,E) % Compute homogenized parameter
     Ap(counter)=A_p(1,1);
 end
@@ -125,7 +128,9 @@ for k=1:1
     [Cpc,st,norm_evolpc, estimpc, delaypc, sol_normpc]=solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
     norm_evolp;
     Tpc(k,counter) = toc;
-    Spc(k,counter) = st;
+     stepses=size(norm_evolpc);
+
+    Spc(k,counter) = stepses(2);
     A_pc(:,k)=Hom_parameter_grad(Cpc,A,G,E) % Compute homogenized parameter
     Apc(counter)=A_pc(1,1);
 end
@@ -140,7 +145,8 @@ for k=1:1
     [Cg,st,norm_evolg, estimg, delayg, sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
     %sol_normg
     Tg(k,counter)=toc;
-    Sg(k,counter) = st;
+    stepses=size(norm_evolg);
+    Sg(k,counter) =stepses(2);
     A_g(:,k)=Hom_parameter(Cg,A,G,E)% Compute homogenized parameter
     Ag(counter)=A_g(1,1);
     
@@ -156,7 +162,7 @@ for k=1:1
     norm_evols;
     mean_sym=mean(mean(fftshift(ifft2(ifftshift(G.*C)))))
     Ts(k,counter) = toc;
-    Ss(k,counter) = st;
+    Ss(k,counter) = st+1;
     A_s(:,k)=Hom_parameter(C,A,G,E) % Compute homogenized parameter
     As(counter)=A_s(1,1);
 end
@@ -171,7 +177,7 @@ for k=1:1
     tic;
     [C,st,norm_evol1]=solver_CG_Gn(A,G_m,c_0,E,steps,toler,M_m_half_inv);
     T1(k,counter) = toc;
-    S1(k,counter) = st;
+    S1(k,counter) = st+1;
     A_1(:,k)=Hom_parameter(C,A,G,E) % Compute homogenized parameter
     A1(counter)=A_1(1,1);
 end
@@ -187,7 +193,7 @@ for k=1:1
     [C,st,norm_evol2]=solver_PCG_symPrec(A,G,c_0,E,steps,toler,M_m_half_inv);
 
     T2(k,counter) = toc;
-    S2(k,counter) = st;
+    S2(k,counter) = st+1;
     A_2(:,k)=Hom_parameter(C,A,G,E) % Compute homogenized parameter
     A2(counter)=A_2(1,1);
 end
@@ -201,7 +207,7 @@ for k=1:1
     tic;
     [C,st,norm_evol3, estim3, delay3]=solver_PCG_left(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
     T3(k,counter)=toc;
-    S3(k,counter) = st;
+    S3(k,counter) = st+1;
     A_3(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
     A3(counter)=A_3(1,1);
     
@@ -237,14 +243,14 @@ end
 %% Plot residuals
  figure 
  hold on
- plot((1:S1(1,end)) ,norm_evol1,'*')
- plot((1:S2(1,end)),norm_evol2,'--')
- plot((1:S3(1,end)),norm_evol3,'o')
+ plot((1:S1(1,end)) ,norm_evol1,'')
+ plot((1:S2(1,end)),norm_evol2,'')
+ plot((1:S3(1,end)),norm_evol3,'')
  
-  plot((1:Sp(1,end)),norm_evolp,'*')
-  plot((1:Spc(1,end)),norm_evolpc,'*')
-  plot((1:Sg(1,end)),norm_evolg,'>')
-   plot((1:Ss(1,end)),norm_evols,'o')
+  plot((1:Sp(1,end)),norm_evolp,'')
+  plot((1:Spc(1,end)),norm_evolpc,'')
+  plot((1:Sg(1,end)),norm_evolg,'')
+   plot((1:Ss(1,end)),norm_evols,'')
   
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('in G','Symetric','Left','proj','proj modif','grad norm','sym grad norm','estim3')

@@ -20,12 +20,14 @@ M_0 = LHS_freq_symP(A,u_0,G,M_m);
 
 b_0 = M_m.*RHS_freq(A,E,G);
 
+norm_sol(1)=sqrt(scalar_product(c_0,c_0));
+
 r_0 = b_0-M_0; % 
 
 z_0=r_0./M_m;
 grad_z_0=G.*(z_0./(M_m.^-2));
 nr0 =sqrt(scalar_product_grad(grad_z_0,grad_z_0));
-
+norm_evol(1)=nr0/nr0;
 %nr0 = sqrt(sum(sum(abs(z_0.*z_0))));
 %nr0 = sqrt(sum(sum(abs(r_0.*(M_m.^-2).*r_0))));
 p_0 = r_0;
@@ -39,16 +41,16 @@ for st = 1:steps
     u_1 = u_0 + alfa_0*p_0;
     x_1=u_1.*M_m;
     grad_x_1=G.*(x_1);
-    norm_sol(st)=sqrt(scalar_product_grad_energy(grad_x_1,grad_x_1,A));
+    norm_sol(st+1)=sqrt(scalar_product_grad_energy(grad_x_1,grad_x_1,A));
     r_1 = r_0 - alfa_0*M_1;
     
     z_1=r_1./(M_m);
     grad_z_1=G.*(z_1./(M_m.^-2));
     nr1 =sqrt(scalar_product_grad(grad_z_1,grad_z_1));
-    norm_evol(st)=nr1/nr0;
+    norm_evol(st+1)=nr1/nr0;
    %norm_evol(st)=sqrt(sum(sum(abs(z_1.*z_1))))/nr0;%norm(r_1.*(M_m.^-2).*r_1,'fro')/nr0;
     
-    if (norm_evol(st)<toler)
+    if (norm_evol(st+1)<toler)
          %c_1 = u_1; 
          break; 
     end
