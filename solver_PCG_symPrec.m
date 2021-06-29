@@ -24,6 +24,8 @@ r_0 = b_0-M_0; %
 
 %nr0 = norm(r_0.*(M_m.^-2).*r_0,'fro');
 nr0 = sqrt(sum(sum(abs(r_0.*(M_m.^-2).*r_0))));
+norm_evol(1)=nr0/nr0;
+
 p_0 = r_0;
 for st = 1:steps
     M_1 = LHS_freq_symP(A,p_0,G,M_m);
@@ -32,8 +34,8 @@ for st = 1:steps
     u_1 = u_0 + alfa_0*p_0;
     
     r_1 = r_0 - alfa_0*M_1;
-    norm_evol(st)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;%norm(r_1.*(M_m.^-2).*r_1,'fro')/nr0;
-    if (norm_evol(st)<toler)
+    norm_evol(st+1)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;%norm(r_1.*(M_m.^-2).*r_1,'fro')/nr0;
+    if (norm_evol(st+1)<toler)
          %c_1 = u_1; 
          break; 
     end

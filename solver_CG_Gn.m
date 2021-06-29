@@ -25,7 +25,7 @@ nr0 = sqrt(sum(sum(abs(r_0.*(M_m.^-2).*r_0))));
 % 
 % grad_z_0=G_plain.*(z_0);
 % nr0 =sqrt(scalar_product_grad(grad_z_0,grad_z_0))
-
+norm_evol(1)=nr0/nr0;
 
 
 p_0 = r_0;
@@ -39,9 +39,9 @@ for st = 1:steps
     
 %     grad_Mr_1=G_plain.*(r_1);
 %     norm_evol(st)=sqrt(scalar_product_grad(grad_Mr_1,grad_Mr_1))/nr0;
-    norm_evol(st)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;  %sum(sum(r_1.*(M_m.^-2).*r_1))/nr0;
+    norm_evol(st+1)=sqrt(sum(sum(abs(r_1.*(M_m.^-2).*r_1))))/nr0;  %sum(sum(r_1.*(M_m.^-2).*r_1))/nr0;
                     
-    if ( norm_evol(st)<toler)
+    if ( norm_evol(st+1)<toler)
          c_1 = x_1; 
          break; 
     end

@@ -1,4 +1,4 @@
-function [GPAFGFx] = Projection_rhs(A,E,G,C_ref,M_f)
+function [GPAFGFx] = Projection_rhs(A,E,G,M_f)
 % transformace Fx a derivace G*F
 % grad(c)
 %L=chol(C_ref);
@@ -28,11 +28,7 @@ GPAFGFx=G.*GC_refG_inv.*GFAFGFx;
 
 GPAFGFx((end+1)/2,(end+1)/2,:)=0;
 
-% FGPAFGFx=fftshift(ifft2(ifftshift(GPAFGFx)));
-% 
-% BFGPAFGFx=cat(3,C_ref(1,1).*FGPAFGFx(:,:,1)+C_ref(1,2).*FGPAFGFx(:,:,2),...
-%             C_ref(2,1).*FGPAFGFx(:,:,1)+C_ref(2,2).*FGPAFGFx(:,:,2));
-% FBFGPAFGFx=fftshift(fft2(ifftshift(BFGPAFGFx)));
+
 
 
 end
