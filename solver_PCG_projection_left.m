@@ -7,7 +7,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
     norm_sol(1)=sqrt(scalar_product_grad(c_0,c_0));
     
     
-    M_0 =Material_data_mul(A,grad_c_0)
+    M_0 =Material_data_mul(A,grad_c_0);
     Fb_0=cat(3,A(:,:,1,1).*E(1)+A(:,:,1,2).*E(2),...
               A(:,:,2,1).*E(1)+A(:,:,2,2).*E(2));
           
@@ -16,8 +16,8 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
     
     r_0 = b_0-M_0;
     
-    Dr_0=G.*r_0;
-    Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2)  %%% r_O disp
+%     Dr_0=G.*r_0;
+%     Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2)  %%% r_O disp
         
 %     M_0 = Projection_plain(grad_c_0,G,M_f); % Projection*Material*grad
 %     b_0 = Projection_plain(E,G,M_f); % Right hand side vector
@@ -49,11 +49,12 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
    
     Dr_0=G.*r_0;
     Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2) ;
-
     nr0=sqrt(scalar_product(Dr_0,Dr_0));
-     norm_evol_rr(1)=nr0/nr0
     
-    nz0r0 =sqrt(-scalar_product_grad(r_0,z_0));
+%     nr0=sqrt(scalar_product_grad(r_0,r_0));
+     norm_evol_rr(1)=nr0/nr0;
+    
+    nz0r0 =sqrt(scalar_product_grad(r_0,z_0));
     norm_evol_rz(1)=nz0r0/nz0r0;
     
     
@@ -78,16 +79,16 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
         
         z_1=Projection_plain(r_1,G,M_f);
 
-       Dr_1=G.*r_1;
+        Dr_1=G.*r_1;
         Dr_1=Dr_1(:,:,1)+Dr_1(:,:,2) ;
         
         nr1=sqrt(scalar_product(Dr_1,Dr_1));
-        
+         
        % nr1=sqrt(scalar_product_grad(r_1,r_1));
         norm_evol_rr(st+1)=nr1/nr0;
         
         
-        nz1r1=sqrt(-scalar_product_grad(r_1,z_1));
+        nz1r1=sqrt(scalar_product_grad(r_1,z_1));
         norm_evol_rz(st+1)=nz1r1/nz0r0;
         
             if ( norm_evol_rr(st+1)<toler)

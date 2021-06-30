@@ -13,7 +13,7 @@ AFGFx=cat(3,A(:,:,1,1).*E(1)+A(:,:,1,2).*E(2),...
 % BtAFGFx_p=cat(3,L(1,1).*AFGFx(:,:,1)+L(2,1).*AFGFx(:,:,2),...
 %             L(1,2).*AFGFx(:,:,1)+L(2,2).*AFGFx(:,:,2));
 
-GFAFGFx_p=G.*fftshift(fft2(ifftshift(AFGFx)));
+GFAFGFx_p=conj(G).*fftshift(fft2(ifftshift(AFGFx)));
 GFAFGFx=GFAFGFx_p(:,:,1)+GFAFGFx_p(:,:,2);
 
 % Inverse operator ((G'*C*G)^-1)

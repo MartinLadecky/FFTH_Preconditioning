@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol, estim,  norm_sol,e_norm_error] = solver_GP_projection_left_modif(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
+function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = solver_GP_projection_left_modif(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
     %% input
     % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
     % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
@@ -24,13 +24,19 @@ function [c_1,st,norm_evol, estim,  norm_sol,e_norm_error] = solver_GP_projectio
     b_0 = Projection_rhs(A,E,G,M_f); % Right hand side vector
 
     r_0 = b_0-M_0; % x_0=0 
-
+    z_0=r_0;
+    
+%     nr0=sqrt(scalar_product_grad(r_0,r_0));
+%     nr0=
+%     norm_evol(1)=nr0/nr0;
     
     nr0=sqrt(scalar_product_grad(r_0,r_0));
-    nr0=sqrt(scalar_product_grad_energy_ref(r_0,r_0,C_ref));
-    norm_evol(1)=nr0/nr0;
+    norm_evol_rr(1)=nr0/nr0;
     
-    z_0=r_0;
+    nz0r0 =sqrt(scalar_product_grad_energy_ref(r_0,r_0,C_ref));
+    norm_evol_rz(1)=nz0r0/nz0r0;
+    
+    
     p_0 = z_0;
     
     k=1;
@@ -67,9 +73,17 @@ function [c_1,st,norm_evol, estim,  norm_sol,e_norm_error] = solver_GP_projectio
 %         z_1=fftshift(fft2(ifftshift(CFr_1)));
         
         %nr1=sqrt(scalar_product_grad(r_1,r_1));
-        nr1=sqrt(scalar_product_grad_energy_ref(r_1,r_1,C_ref));
-        norm_evol(st+1)=nr1/nr0;
-            if ( norm_evol(st+1)<toler)
+        
+        nr1=sqrt(scalar_product_grad(r_1,r_1));
+        norm_evol_rr(st+1)=nr1/nr0;
+        
+        
+        nz1r1=sqrt(scalar_product_grad_energy_ref(r_1,r_1,C_ref));
+        norm_evol_rz(st+1)=nz1r1/nz0r0;
+        
+        
+
+            if ( norm_evol_rr(st+1)<toler)
                 % c_1 = c_0; 
                 break; 
             end  

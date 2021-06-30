@@ -8,7 +8,7 @@ AFGFx=cat(3,A(:,:,1,1).*FGFx(:,:,1)+A(:,:,1,2).*FGFx(:,:,2),...
 
 %% Projection operator
 
-GFAFGFx_p=G.*fftshift(fft2(ifftshift(AFGFx)));
+GFAFGFx_p=conj(G).*fftshift(fft2(ifftshift(AFGFx)));
 GFAFGFx=GFAFGFx_p(:,:,1)+GFAFGFx_p(:,:,2);
 
 GC_refG_inv=M_f.^-1;

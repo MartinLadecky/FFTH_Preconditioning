@@ -75,92 +75,67 @@ toler = 1e-6;
 c_000=zeros(N_2,N_1);
 
 
-%% Projection based solver
+%% GBection based solvers
 c_0 = c_000;
 
-disp('Projection based solver')
+disp('Gradient-Based Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-   %[Cp,st,norm_evol_proj_grad, norm_evol_proj_energy, estimp,  sol_normp]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
-   disp('Projection based solver')
-    [Cp,st,norm_evol_proj_grad, norm_evol_proj_energy, estimp,  sol_normp]=solver_PCG_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau);
-    
-    %sol_normp
-    norm_evol_proj_grad
-    Tp(k,counter) = toc;
-         stepses=size(norm_evol_proj_grad);
+   [C_GB_CG,st_GB_CG, norm_evol_GB_CG_grad, norm_evol_GB_CG_energy, estim_GB_CG,  sol_norm_GB_CG]=solver_GP_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
+     
+    T_GB_CG(k,counter) = toc;
+    stepses=size(norm_evol_GB_CG_grad);
 
-    Sp(k,counter) = stepses(2);
-  %  Sp(k,counter) = st+1;
-    A_p(:,k)=Hom_parameter_grad(Cp,A,G,E) % Compute homogenized parameter
-    Ap(counter)=A_p(1,1);
+    S_GB_CG(k,counter) = stepses(2);
+    A_(:,k)=Hom_parameter_grad(C_GB_CG,A,G,E) % Compute homogenized parameter
+    A_GB_CG(counter)=A_(1,1);
 end
 
-disp('Projection based solver: modified with C_ref new')
+disp('Modifield Gradient-Based Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [Cpm,st,norm_evolpm, estimpm,  sol_normpm]=solver_GP_projection_left_modif(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
-    %sol_normp
-    norm_evolpm;
-    Tpm(k,counter) = toc;
-    stepses=size(norm_evolpm);
+    [C_GB_CG_mod,st_GB_CG_mod,norm_evol_GB_CG_mod_grad,norm_evol_GB_CG_mod_energy, estim_GB_CG_mod,  sol_norm_GB_CG_mod]=solver_GP_projection_left_modif(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
 
-    Spm(k,counter) = stepses(2);
-  %  Sp(k,counter) = st+1;
-    A_p(:,k)=Hom_parameter_grad(Cpm,A,G,E) % Compute homogenized parameter
-    Apm(counter)=A_p(1,1);
+    T_GB_CG_mod(k,counter) = toc;
+    stepses=size(norm_evol_GB_CG_mod_grad);
+
+    S_GB_CG_mod(k,counter) = stepses(2);
+
+    A_(:,k)=Hom_parameter_grad(C_GB_CG_mod,A,G,E) % Compute homogenized parameter
+    A_GB_CG_mod(counter)=A_(1,1);
 end
 
-% % Projection based solver: modified with C_ref 
-% c_0 = c_000;
-% 
-% disp('Projection based solver: modified with C_ref ')
-% for k=1:1
-%     E=E_0(:,k); 
-%     tic;
-%     [Cpc,st,norm_evolpc, estimpc,  sol_normpc]=solver_GP_projection_left_Cref(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
-%     norm_evolpc;
-%     Tpc(k,counter) = toc;
-%      stepses=size(norm_evolpc);
-% 
-%     Spc(k,counter) = stepses(2);
-%     A_pc(:,k)=Hom_parameter_grad(Cpc,A,G,E) % Compute homogenized parameter
-%     Apc(counter)=A_pc(1,1);
-% end
+disp('Gradient-Based Preconditioned Conjugage Gradient solver')
+for k=1:1
+    E=E_0(:,k); 
+    tic;
+    [C_GB_PCG,st_GB_PCG, norm_evol_GB_PCG_grad, norm_evol_GB_PCG_energy, estim_GB_PCG,  sol_norm_GB_PCG]=solver_PCG_projection_left(A,G,c_0,E,steps,toler,M_m,d,tau);
 
+    T_GB_PCG(k,counter) = toc;
+         stepses=size(norm_evol_GB_PCG_grad);
 
-% % SOLVER with constant preconditionig from left grad error measure
-% c_0=c_000;
-% disp('SOLVER with constant preconditionig from left hand side ::: grad error measure')
-% for k=1:1
-%     E=E_0(:,k);
-%     tic;
-%     [Cg,st,norm_evolg, estimg,  sol_normg]=solver_PCG_left_grad_norm(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
-%     sol_normg
-%     Tg(k,counter)=toc;
-%     stepses=size(norm_evolg);
-%     Sg(k,counter) =stepses(2);
-%     A_g(:,k)=Hom_parameter(Cg,A,G,E)% Compute homogenized parameter
-%     Ag(counter)=A_g(1,1);
-%     
-% end
+    S_GB_PCG(k,counter) = stepses(2);
 
-%% SOLVER with constant preconditionig from left hand side
+    A_(:,k)=Hom_parameter_grad(C_GB_PCG,A,G,E) % Compute homogenized parameter
+    A_GB_PCG(counter)=A_(1,1);
+end
+
+%% Displacement-Based Preconditioned Conjugage Gradient solver
+disp('Displacement-Based Preconditioned Conjugage Gradient solver')
+
 c_0=c_000;
-disp('SOLVER with constant preconditionig from left hand side')
 %toler = 1e-10;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C,st,norm_evol_PCG_rr,norm_evol_PCG_rz,norm_evol_PCG_DrDr, estim3 ]=solver_PCG_left(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
-    norm_evol_PCG_rr
-    norm_evol_PCG_rz
-    T3(k,counter)=toc;
-    S3(k,counter) = st+1;
-    A_3(:,k)=Hom_parameter(C,A,G,E)% Compute homogenized parameter
-    A3(counter)=A_3(1,1);
+    [C_DB_PCG,st_DB_PCG,norm_evol_DB_PCG_rr,norm_evol_DB_PCG_energy, norm_evol_DB_PCG_grad, estim_DB_PCG]=solver_PCG_left(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
+
+    T_DB_PCG(k,counter)=toc;
+    S_DB_PCG(k,counter) = st_DB_PCG+1;
+    A_(:,k)=Hom_parameter(C_DB_PCG,A,G,E)% Compute homogenized parameter
+    A_DB_PCG(counter)=A_(1,1);
     
 end
 
@@ -170,65 +145,75 @@ end
 end
 
 % % Plot estimates
- rel_estim3=(estim3./estim3(1));%.^(1/2);
+ rel_estim_DB_PCG=(estim_DB_PCG./estim_DB_PCG(1));%.^(1/2);
 % rel_estimg=estimg./estimg(1);
- rel_estimp=estimp./estimp(1);
-% 
-%  figure 
-%  hold on
-% plot((1:numel(estim3)),abs(rel_estim3),'.')
-%    plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'.') 
-%   
-%  plot((1:numel(estimg)),abs(rel_estimg),'--x')
-%   plot((1:numel(estimg)),abs(rel_estimg./(1-tau)),'--x')
-%   
-%   plot((1:numel(estimp)),abs(rel_estimp),'--o')
-%   plot((1:numel(estimp)),abs(rel_estimp./(1-tau)),'--o')
-%   
-% set(gca, 'XScale', 'linear', 'YScale', 'log');
-% legend('rel estim3 lower','rel estim3 upper','rel estimg lower','rel estimg upper','rel estimp lower','rel estimp upper')
-% title('Energetic norm estimates')
+ rel_estim_GB_CG=estim_GB_CG./estim_GB_CG(1);
+
 
 %% Plot residuals
  figure 
  hold on
- plot((1:numel(estim3)),abs(rel_estim3),'.')
-  plot((1:numel(estim3)),abs(rel_estim3./(1-tau)),'.')
- plot((1:S3(1,end)),norm_evol_PCG_rr,'--')
- plot((1:S3(1,end)),norm_evol_PCG_DrDr,'--')
- plot((1:S3(1,end)),norm_evol_PCG_rz,'--')
+
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--')
+ 
+
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.x')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.o')
+
+    plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.x')
+  plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.o')
+  
+  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_grad,'-.x')
+  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.o')
+ 
+set(gca, 'XScale', 'linear', 'YScale', 'log');
+legend('DB || r ||','DB  ||Dr||', 'DB  ||r||_M', ...
+         'GB CG ||Dr||', 'GB CG ||r||_M',...
+          'GB CG mod ||Dr||', 'GB CG mod ||r||_M',...
+        'GB  PCG ||Dr||', 'GB PCG ||r||_M')
+title('Residuals ')
+%% Plot residuals
+ figure 
+ hold on
+ plot((1:numel(estim_DB_PCG)),abs(rel_estim_DB_PCG),'.')
+  plot((1:numel(estim_DB_PCG)),abs(rel_estim_DB_PCG./(1-tau)),'.')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--')
  
  
- plot((1:numel(estimp)),abs(rel_estimp),'.')
- plot((1:numel(estimp)),abs(rel_estimp./(1-tau)),'.')
-  plot((1:Sp(1,end)),norm_evol_proj_grad,'-.x')
-  plot((1:Sp(1,end)),norm_evol_proj_energy,'-.o')
+ plot((1:numel(estim_GB_CG)),abs(rel_estim_GB_CG),'.')
+ plot((1:numel(estim_GB_CG)),abs(rel_estim_GB_CG./(1-tau)),'.')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.x')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.o')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('DB estim || e_k ||_K',' DB estim || e_k ||_K','DB || r ||','DB  ||Dr||', 'DB  ||r||_M', ...
     'GB estim || e_k ||_K',' GB estim || e_k ||_K','GB  ||Dr||', 'GB ||r||_M')
-title('Residuals PCG left')
+title('Residuals 2')
 
 %% Plot residuals
  figure 
  hold on
- plot((1:S3(1,end)),norm_evol_PCG_rr,'--')
- plot((1:S3(1,end)),norm_evol_PCG_DrDr,'--')
- plot((1:S3(1,end)),norm_evol_PCG_rz,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--')
 
  
  %plot((1:Sg(1,end)),norm_evolg,'-o') %'DB modif',
  
-  plot((1:Sp(1,end)),norm_evol_proj_grad,'-.')
-  plot((1:Sp(1,end)),norm_evol_proj_energy,'-.')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.')
   
 %  plot((1:Spc(1,end)),norm_evolpc,'-.')%'GB modif',
-  plot((1:Spm(1,end)),norm_evolpm,'-.')
+  plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.')
 
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('DB PCG || r ||','DB PCG  ||Dr||', 'DB PCG ||r||_M' ...
     ,'GB orig ||Dr|| ','GB orig ||r||_M','GB modif 2')
-title('Residuals')
+title('Residuals with modif CG')
 %% Plot solution difference
 %  figure 
 %  hold on
@@ -240,21 +225,23 @@ title('Residuals')
  %plot((1:Sp(1,end)),abs(norm_evolp-norm_evolg),'-.*')
 
 % set(gca, 'XScale', 'linear', 'YScale', 'log');
-% legend('sol_norm  proj- grad ','sol_norm proj - sym')
+% legend('sol_norm  GB- grad ','sol_norm GB - sym')
 % title('solution difference')
 %% Plot solution norm
 
  figure 
  hold on
  
-  %plot((1:Sg(1,end)),abs(sol_normg(end)-sol_normg),'x')
+%  plot((1:Sg(1,end)),abs(sol_normg(end)-sol_normg),'x')
   
- plot((1:Sp(1,end)),abs(sol_normp(end)-sol_normp),'-.*')
-  plot((1:Spm(1,end)),abs(sol_normpm(end)-sol_normpm),'-.o')
-
+ plot((1:S_GB_CG(1,end)),abs(sol_norm_GB_CG(end)-sol_norm_GB_CG),'-.*')
+ 
+  plot((1:S_GB_CG_mod(1,end)),abs(sol_norm_GB_CG_mod(end)-sol_norm_GB_CG_mod),'-.o')
+  
+plot((1:S_GB_PCG(1,end)),abs(sol_norm_GB_PCG(end)-sol_norm_GB_PCG),'-.^')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB modif','GB orig','GB modif')
+legend('GB CG orig','GB CG modif','GB PCG ')
 title('solution norm')
 
 %% Plot steps
@@ -289,7 +276,7 @@ title('solution norm')
 %  plot(NoP,imag(A3)','^')
 %  plot(NoP,imag(Ap)','-.*')
 %  plot(NoP,imag(Ag)','-.^') 
-% legend('in G','Symetric','Left','proj','grad norm')
+% legend('in G','Symetric','Left','GB','grad norm')
 
 
 close all

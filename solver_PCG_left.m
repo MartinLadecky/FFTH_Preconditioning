@@ -16,9 +16,7 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
     M_0 = LHS_freq(A,c_0,G); % System matrix * initial solution(x_0=c_0)
     b_0 = RHS_freq(A,E,G);  % Right hand side vector
 
-    
-    
-    r_0 = b_0-M_0 % x_0=0
+    r_0 = b_0-M_0; % x_0=0
     
     nr0 =norm(r_0,'fro');
     norm_evol_rr(1)=nr0/nr0;
@@ -26,16 +24,15 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
     nDr0Dr0=sqrt(scalar_product_grad(G.*r_0,G.*r_0));
     norm_evol_grad(1)=nDr0Dr0/nDr0Dr0;
 
-    z_0 = r_0./M_f % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
+    z_0 = r_0./M_f; % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
 
-    %Gz=G.*z_0
-    scalar_product(r_0,z_0)
-    
-    
-    
-    
-    
-    nz0r0 = sqrt(scalar_product(r_0,z_0))
+%     Gz=G.*z_0
+%     scalar_product(r_0,z_0)
+%     
+%     
+%     
+%     
+    nz0r0 = sqrt(scalar_product(r_0,z_0));
     norm_evol_energy(1)=nz0r0/nz0r0;
     
 
@@ -47,9 +44,9 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
     for st = 1:steps
         Ap_0 = LHS_freq(A,p_0,G);
      
-        z_0r_0= sum(sum((z_0.')'.*r_0))
-        p_0Ap_0=sum(sum((p_0.')'.*Ap_0))
-        alfa_0 = z_0r_0/p_0Ap_0
+        z_0r_0= sum(sum((z_0.')'.*r_0));
+        p_0Ap_0=sum(sum((p_0.')'.*Ap_0));
+        alfa_0 = z_0r_0/p_0Ap_0;
         
 
         c_1 = c_0 + alfa_0.*p_0;
@@ -74,8 +71,8 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
          z_1=r_1./M_f;
         G.*z_1;
         
-        z_1r_1=real(sum(sum((z_1.')'.*r_1)))
-        beta_1 =z_1r_1 /z_0r_0
+        z_1r_1=real(sum(sum((z_1.')'.*r_1)));
+        beta_1 =z_1r_1 /z_0r_0;
         p_1 = z_1 + beta_1*p_0;
         
         Delta(st)=real(alfa_0*z_1r_1);

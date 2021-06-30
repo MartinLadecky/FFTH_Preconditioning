@@ -78,7 +78,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
 %             C_ref_inv(:,:,2,1).*Fr_1(:,:,1)+C_ref_inv(:,:,2,2).*Fr_1(:,:,2));
 %         z_1=fftshift(fft2(ifftshift(CFr_1)));
         
-        nz1=sqrt(scalar_product_grad(z_1,z_1))
+        nz1=sqrt(scalar_product_grad(z_1,z_1));
         norm_evol_rr(st+1)=nz1/nz0;
         
         
