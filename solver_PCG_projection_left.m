@@ -17,28 +17,43 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
     r_0 = b_0-M_0;
     
     Dr_0=G.*r_0;
-    Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2)
+    Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2)  %%% r_O disp
         
 %     M_0 = Projection_plain(grad_c_0,G,M_f); % Projection*Material*grad
 %     b_0 = Projection_plain(E,G,M_f); % Right hand side vector
-  % MM=M_f.^-1;
-      
-    MDr=Dr_0./M_f
-  %  MDr=MM.*Dr_0
-    nz0r0_test = sqrt(scalar_product(Dr_0,MDr))
-    
-    DMDr=G.*MDr
-    nz0r0_test = sqrt(scalar_product_grad(r_0,DMDr))
-    
-    rDMDr=(r_0(:,:,1).')'.*DMDr(:,:,1)+(r_0(:,:,2).')'.*DMDr(:,:,2)
-    sqrt(sum(sum(rDMDr)))
+
+      %% test
+%     MDr=Dr_0./M_f  %%% z_O disp
+% 
+%     nz0r0_test_scal = scalar_product(Dr_0,MDr)
+%     
+%     DMDrtest(:,:,1)=(G(:,:,1).')'.*MDr;
+%     DMDrtest(:,:,2)=(G(:,:,2).')'.*MDr;
+%     G
+%     conj(G)
+%     nz0r0_test_trans = scalar_product_grad(r_0,DMDrtest)
+%     
+%     DMDr=G.*MDr;
+%     nz0r0_test = scalar_product_grad(r_0,DMDr)
+%     
+%     rDMDr=(r_0(:,:,1).')'.*DMDr(:,:,1)+(r_0(:,:,2).')'.*DMDr(:,:,2)
+%     sum(sum(rDMDr))
+%     
     
     z_0=Projection_plain(r_0,G,M_f);
+%     sum(sum(DMDr-z_0))
+%     scalar_product_grad(r_0,z_0)
     
-    nz0=sqrt(scalar_product_grad(r_0,z_0))
-    norm_evol_rr(1)=nz0/nz0
+%     nr0=sqrt(scalar_product_grad(r_0,r_0))
+%     norm_evol_rr(1)=nr0/nr0
+   
+    Dr_0=G.*r_0;
+    Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2) ;
+
+    nr0=sqrt(scalar_product(Dr_0,Dr_0));
+     norm_evol_rr(1)=nr0/nr0
     
-    nz0r0 =sqrt(scalar_product_grad_energy_ref(z_0,r_0,C_ref));
+    nz0r0 =sqrt(-scalar_product_grad(r_0,z_0));
     norm_evol_rz(1)=nz0r0/nz0r0;
     
     
@@ -63,21 +78,26 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
         
         z_1=Projection_plain(r_1,G,M_f);
 
-        nz1=sqrt(scalar_product_grad(r_1,z_1));
-        norm_evol_rr(st+1)=nz1/nz0;
+       Dr_1=G.*r_1;
+        Dr_1=Dr_1(:,:,1)+Dr_1(:,:,2) ;
+        
+        nr1=sqrt(scalar_product(Dr_1,Dr_1));
+        
+       % nr1=sqrt(scalar_product_grad(r_1,r_1));
+        norm_evol_rr(st+1)=nr1/nr0;
         
         
-        nz1r1=sqrt(scalar_product_grad_energy_ref(z_1,r_1,C_ref));
+        nz1r1=sqrt(-scalar_product_grad(r_1,z_1));
         norm_evol_rz(st+1)=nz1r1/nz0r0;
         
             if ( norm_evol_rr(st+1)<toler)
                 % c_1 = c_0; 
                 break; 
             end  
-        
+%         
     
-        z_1r_1=scalar_product_grad(r_1,z_1)
-        beta_1 =  z_1r_1/z_0r_0
+        z_1r_1=scalar_product_grad(r_1,z_1);
+        beta_1 =  z_1r_1/z_0r_0;
         p_1 = z_1 + beta_1*p_0;
         
 %         %error estimates
