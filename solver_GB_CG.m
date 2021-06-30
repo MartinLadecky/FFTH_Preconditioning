@@ -1,4 +1,4 @@
-function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = solver_GP_projection_left(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
+function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = solver_GB_CG(A,G,c_0,E,steps,toler,M_f,C_ref,tau,G_m,C_ref_inv)
     %% input
     % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
     % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
@@ -18,7 +18,8 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = so
     c_0=grad_c_0;
     %grad_c_0=grad_c_0-mean(mean(grad_c_0));
      % Gradient in real space
-    norm_sol(1)=sqrt(scalar_product_grad(c_0,c_0));
+    norm_sol(1)=sqrt(scalar_product_grad_energy(G.*c_0,G.*c_0,A));
+
     
     M_0 = Projection(A,grad_c_0,G,M_f); % Projection*Material*grad
     b_0 = Projection_rhs(A,E,G,M_f) ;% Right hand side vector

@@ -1,9 +1,8 @@
-function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = solver_PCG_projection_left(A,G,c_0,E,steps,toler,M_f,C_ref,tau)
+function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol,e_norm_error] = solver_GB_PCG(A,G,c_0,E,steps,toler,M_f,C_ref,tau)
 
     grad_c_0=G.*c_0; % Gradient [N_bf2,N_bf1,2]
     c_0=grad_c_0;
-    %grad_c_0=grad_c_0-mean(mean(grad_c_0));
-     % Gradient in real space
+
     norm_sol(1)=sqrt(scalar_product_grad(c_0,c_0));
     
     

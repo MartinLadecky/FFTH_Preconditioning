@@ -1,18 +1,6 @@
-function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_PCG_left(A,G,c_0,E,steps,toler,M_f,tau)
+function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] = solver_DB_PCG(A,G,c_0,E,steps,toler,M_f,tau)
     %% input
-    % A   [N_bf2,N_bf1,2,2] -matrix of material parameters in every point of grid
-    % G_n [N_bf2,N_bf1,2]   -matrix of coeficients of 1st derivative
-    % c_0 [N_bf2,N_bf1]     -initial solution
-    % E   [2,1]             -vector [0;1] or [1;0]
-    % toler [1]             -relative tolerance
-    % steps [1]             -max number of steps
-    %% Output
-    % c_0 [N_bf2,N_bf1]     -vector of solution
-    % st  [1]               -number of stepts
-    %% 
-    % toler           % relative toleranceF
-    % steps           % -max number of steps
-    %norm_evol=0;
+    norm_sol(1)=sqrt(scalar_product_grad_energy(G.*c_0,G.*c_0,A));
     M_0 = LHS_freq(A,c_0,G); % System matrix * initial solution(x_0=c_0)
     b_0 = RHS_freq(A,E,G);  % Right hand side vector
 
@@ -26,21 +14,16 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
 
     z_0 = r_0./M_f; % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
 
-%     Gz=G.*z_0
-%     scalar_product(r_0,z_0)
-%     
-%     
-%     
-%     
+
     nz0r0 = sqrt(scalar_product(r_0,z_0));
     norm_evol_energy(1)=nz0r0/nz0r0;
     
 
     p_0 = z_0;
-   % save('experiment_data/sol_10_10-10.mat','C');
+
     k=1;
     d=0;
-   estim=0;
+    estim=0;
     for st = 1:steps
         Ap_0 = LHS_freq(A,p_0,G);
      
@@ -50,28 +33,29 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
         
 
         c_1 = c_0 + alfa_0.*p_0;
-        G.*c_1;
+        
+        norm_sol(st+1)=sqrt(scalar_product_grad_energy(G.*c_1,G.*c_1,A));
         r_1 = r_0-alfa_0*Ap_0;
         
-          
-       
-        
+
+         z_1=r_1./M_f;
+         z_1r_1=real(sum(sum((z_1.')'.*r_1)));
        	%nr1=sqrt(sum(sum(abs(r_1.*z_1))));
         nr1 =norm(r_1,'fro');
         norm_evol_rr(st+1)=nr1/nr0;
         nDr1Dr1=sqrt(scalar_product_grad(G.*r_1,G.*r_1));
         norm_evol_grad(st+1)=nDr1Dr1/nDr0Dr0;
 
-        norm_evol_energy(st+1)=sqrt(z_0r_0)/nz0r0;
+        norm_evol_energy(st+1)=sqrt(z_1r_1)/nz0r0;
             if ( norm_evol_rr(st+1)<toler)
                 %c_1 = c_0; 
                 break; 
             end  
         
-         z_1=r_1./M_f;
+        
         G.*z_1;
         
-        z_1r_1=real(sum(sum((z_1.')'.*r_1)));
+        
         beta_1 =z_1r_1 /z_0r_0;
         p_1 = z_1 + beta_1*p_0;
         
