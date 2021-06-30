@@ -9,7 +9,8 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
     nr0 =norm(r_0,'fro');
     norm_evol_rr(1)=nr0/nr0;
     
-    nDr0Dr0=sqrt(scalar_product_grad(G.*r_0,G.*r_0));
+    %nDr0Dr0=sqrt(scalar_product_grad(G.*r_0,G.*r_0));
+    nDr0Dr0=sqrt(scalar_product(r_0,r_0));
     norm_evol_grad(1)=nDr0Dr0/nDr0Dr0;
 
     z_0 = r_0./M_f; % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
@@ -43,7 +44,9 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
        	%nr1=sqrt(sum(sum(abs(r_1.*z_1))));
         nr1 =norm(r_1,'fro');
         norm_evol_rr(st+1)=nr1/nr0;
-        nDr1Dr1=sqrt(scalar_product_grad(G.*r_1,G.*r_1));
+        
+        %nDr1Dr1=sqrt(scalar_product_grad(G.*r_1,G.*r_1));
+        nDr1Dr1=sqrt(scalar_product(r_0,r_0));
         norm_evol_grad(st+1)=nDr1Dr1/nDr0Dr0;
 
         norm_evol_energy(st+1)=sqrt(z_1r_1)/nz0r0;
@@ -51,14 +54,16 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
                 %c_1 = c_0; 
                 break; 
             end  
-        
-        
-        G.*z_1;
-        
-        
+
         beta_1 =z_1r_1 /z_0r_0;
         p_1 = z_1 + beta_1*p_0;
+        %% 
+        p_0 = p_1;
+        r_0 = r_1;
+        z_0 = z_1; 
+        c_0 = c_1;
         
+        %% error estimates
         Delta(st)=real(alfa_0*z_1r_1);
         curve(st)=0;
         curve=curve+Delta(st);
@@ -76,13 +81,6 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
             end
             d=d+1;
         end
-        
-        
-        %% 
-        p_0 = p_1;
-        r_0 = r_1;
-        z_0 = z_1; 
-        c_0 = c_1;
     end
 end
 

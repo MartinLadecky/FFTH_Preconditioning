@@ -9,7 +9,7 @@ A_0=zeros(2,2);
 
 counter=1;
 steps = 500;
-for loop=[10]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+for loop=[12]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -47,7 +47,8 @@ x=zeros(N_2,N_1,2);
 %% Material ananlysis
 d=[mean(mean(A(:,:,1,1))) mean(mean(A(:,:,1,2)));...
    mean(mean(A(:,:,2,1))) mean(mean(A(:,:,2,2)))];
-
+d=[1 0;
+    0 1];
 d_inv=d^-1;
 for i=1:N_2
      for j=1:N_1    
@@ -110,10 +111,10 @@ disp('Gradient-Based Preconditioned Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C_GB_PCG,st_GB_PCG, norm_evol_GB_PCG_grad, norm_evol_GB_PCG_energy, estim_GB_PCG,  sol_norm_GB_PCG]=solver_GB_PCG(A,G,c_0,E,steps,toler,M_m,d,tau);
+    [C_GB_PCG,st_GB_PCG, norm_evol_GB_PCG_rr, norm_evol_GB_PCG_energy, estim_GB_PCG,  sol_norm_GB_PCG]=solver_GB_PCG(A,G,c_0,E,steps,toler,M_m,d,tau);
 
     T_GB_PCG(k,counter) = toc;
-         stepses=size(norm_evol_GB_PCG_grad);
+         stepses=size(norm_evol_GB_PCG_rr);
 
     S_GB_PCG(k,counter) = stepses(2);
 
@@ -152,8 +153,8 @@ end
  figure 
  hold on
 
- plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--b')
- plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--xb')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--xb')
+ %plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--b')
  plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--ob')
  
 
@@ -163,14 +164,14 @@ end
     plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
   plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.og')
   
-  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_grad,'-.xk')
+  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_rr,'-.xk')
   plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.ok')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB || r ||','DB  ||Dr||', 'DB  ||r||_M', ...
-         'GB CG ||Dr||', 'GB CG ||r||_M',...
-          'GB CG mod ||Dr||', 'GB CG mod ||r||_M',...
-        'GB  PCG ||Dr||', 'GB PCG ||r||_M')
+legend('DB PCG || r ||','DB PCG ||Dr||', 'DB PCG ||r||_M', ...
+         'GB CG ||r||', 'GB CG ||r||_M',...
+          'GB CG mod ||r||', 'GB CG mod ||r||_M',...
+        'GB PCG ||Dr||', 'GB PCG ||r||_M')
 title('Residuals ')
 %% Plot residuals
  figure 
