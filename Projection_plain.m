@@ -1,6 +1,7 @@
 function [GPAFGFx] = Projection_plain(GFx,G,M_f)
 %% Projection operator
 
+%GFAFGFx_p=conj(G).*GFx;
 GFAFGFx_p=G.*GFx;
 GFAFGFx=GFAFGFx_p(:,:,1)+GFAFGFx_p(:,:,2);
 

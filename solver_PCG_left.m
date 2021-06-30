@@ -18,7 +18,7 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
 
     
     
-    r_0 = b_0-M_0; % x_0=0
+    r_0 = b_0-M_0 % x_0=0
     
     nr0 =norm(r_0,'fro');
     norm_evol_rr(1)=nr0/nr0;
@@ -28,7 +28,13 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
 
     z_0 = r_0./M_f % solve lin system rM_0=M_f^(-1)*r_0: rM_0 is idagonal matrix
 
-    Gz=G.*z_0
+    %Gz=G.*z_0
+    scalar_product(r_0,z_0)
+    
+    
+    
+    
+    
     nz0r0 = sqrt(scalar_product(r_0,z_0))
     norm_evol_energy(1)=nz0r0/nz0r0;
     
@@ -41,9 +47,9 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim] = solver_P
     for st = 1:steps
         Ap_0 = LHS_freq(A,p_0,G);
      
-        z_0r_0= sum(sum((z_0.')'.*r_0));
-        p_0Ap_0=sum(sum((p_0.')'.*Ap_0));
-        alfa_0 = z_0r_0/p_0Ap_0;
+        z_0r_0= sum(sum((z_0.')'.*r_0))
+        p_0Ap_0=sum(sum((p_0.')'.*Ap_0))
+        alfa_0 = z_0r_0/p_0Ap_0
         
 
         c_1 = c_0 + alfa_0.*p_0;
