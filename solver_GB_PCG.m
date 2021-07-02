@@ -1,14 +1,14 @@
 function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = solver_GB_PCG(A,G,c_0,E,steps,toler,M_f,C_ref,tau)
 
-    grad_c_0=G.*c_0; % Gradient [N_bf2,N_bf1,2]
+    grad_c_0=G.*c_0; % 
     c_0=grad_c_0;
 
-    norm_sol(1)=sqrt(scalar_product_grad(c_0,c_0));
+    norm_sol(1)=sqrt(scalar_product_grad_energy(c_0,c_0,A));
     
     
     M_0 =Material_data_mul(A,grad_c_0);
     Fb_0=cat(3,A(:,:,1,1).*E(1)+A(:,:,1,2).*E(2),...
-              A(:,:,2,1).*E(1)+A(:,:,2,2).*E(2));
+               A(:,:,2,1).*E(1)+A(:,:,2,2).*E(2));
           
     b_0=fftshift(fft2(ifftshift(Fb_0)));
     
@@ -17,18 +17,14 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = s
 
     
     z_0=Projection_plain(r_0,G,M_f);
-%     sum(sum(DMDr-z_0))
-%     scalar_product_grad(r_0,z_0)
-    
-%     nr0=sqrt(scalar_product_grad(r_0,r_0))
-%     norm_evol_rr(1)=nr0/nr0
+
    
     Dr_0=conj(G).*r_0;
     Dr_0=Dr_0(:,:,1)+Dr_0(:,:,2) ;
     nr0=sqrt(scalar_product(Dr_0,Dr_0));
     
-%     nr0=sqrt(scalar_product_grad(r_0,r_0));
-     norm_evol_rr(1)=nr0/nr0;
+    %nr0=sqrt(scalar_product_grad(r_0,r_0));
+    norm_evol_rr(1)=nr0/nr0;
     
     nz0r0 =sqrt(scalar_product_grad(r_0,z_0));
     norm_evol_rz(1)=nz0r0/nz0r0;
@@ -38,20 +34,20 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = s
     
     k=1;
     d=0;
-    C_precise=load('experiment_data/sol_10_10.mat');
+
     estim=0;
     for st = 1:steps
-        Ap_0 = Material_data_mul(A,p_0);%Projection(A,p_0,G,M_f);%LHS_freq(A,p_0,G); 
-
+        Ap_0 = Material_data_mul(A,p_0);
+        
         z_0r_0=scalar_product_grad(r_0,z_0);
         p_0Ap_0=scalar_product_grad(p_0,Ap_0);
         alfa_0 = z_0r_0/p_0Ap_0;
         
-        c_1 = c_0 + alfa_0.*p_0; % [N_bf2,N_bf1] +  scalar*[N_bf2,N_bf1,2]
-
+        c_1 = c_0 + alfa_0.*p_0;
+        
         norm_sol(st+1)=sqrt(scalar_product_grad_energy(c_1,c_1,A));
 
-        r_1 = r_0 - alfa_0*Ap_0 ;
+        r_1 = r_0 - alfa_0*Ap_0;
         
         z_1=Projection_plain(r_1,G,M_f);
 
@@ -59,23 +55,21 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = s
         Dr_1=Dr_1(:,:,1)+Dr_1(:,:,2) ;
         nr1=sqrt(scalar_product(Dr_1,Dr_1));
          
-       % nr1=sqrt(scalar_product_grad(r_1,r_1));
-        norm_evol_rr(st+1)=nr1/nr0;
-        
+        %nr1=sqrt(scalar_product_grad(r_1,r_1));
+        norm_evol_rr(st+1)=nr1/nr0;   
         
         nz1r1=sqrt(scalar_product_grad(r_1,z_1));
         norm_evol_rz(st+1)=nz1r1/nz0r0;
         
             if ( norm_evol_rr(st+1)<toler)
-                % c_1 = c_0; 
                 break; 
-            end  ;
-%         
+            end           
     
         z_1r_1=scalar_product_grad(r_1,z_1);
         beta_1 =  z_1r_1/z_0r_0;
         p_1 = z_1 + beta_1*p_0;
-        %
+        
+        %% reiniticialisation
         p_0 = p_1;
         r_0 = r_1;
         z_0 = z_1; 

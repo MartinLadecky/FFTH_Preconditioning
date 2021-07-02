@@ -8,8 +8,8 @@ A_0=zeros(2,2);
 
 
 counter=1;
-steps = 500;
-for loop=[12]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
+steps = 200;
+for loop=[8]%(4:1:10)%[10]%(4:1:10)%[8]%(4:1:10)%%[8]%(1:1:12)%[8]%(1:1:12)%[1]%(5:1:12)%[1,5,10,11]%,20,21,22
 N_1=2*(loop^2)+1%2*(loop^2)+1% number of points in x_1-1
 
 N_2=N_1; % number of points in x_2
@@ -36,9 +36,9 @@ x=zeros(N_2,N_1,2);
   C_ref=zeros(N_2,N_1,2,2); 
   for i=1:N_2
      for j=1:N_1    
-          A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);
-         % A(i,j,:,:)=a_matrix(x(i,j,:));
-          %A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);          
+            A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);
+          % A(i,j,:,:)=a_matrix(x(i,j,:));
+          % A(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);          
      end       
   end
 
@@ -47,8 +47,8 @@ x=zeros(N_2,N_1,2);
 %% Material ananlysis
 d=[mean(mean(A(:,:,1,1))) mean(mean(A(:,:,1,2)));...
    mean(mean(A(:,:,2,1))) mean(mean(A(:,:,2,2)))];
-d=[1 0;
-    0 1];
+% d=[1 0;
+%     0 1];
 d_inv=d^-1;
 for i=1:N_2
      for j=1:N_1    
@@ -82,7 +82,8 @@ disp('Gradient-Based Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-   [C_GB_CG,st_GB_CG, norm_evol_GB_CG_grad, norm_evol_GB_CG_energy, estim_GB_CG,  sol_norm_GB_CG]=solver_GB_CG(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
+   [C_GB_CG,st_GB_CG, norm_evol_GB_CG_grad, norm_evol_GB_CG_energy, estim_GB_CG,  sol_norm_GB_CG]...
+       =solver_GB_CG(A,G,c_0,E,steps,toler,M_m,d,tau,G_m,C_ref_inv);
      
     T_GB_CG(k,counter) = toc;
     stepses=size(norm_evol_GB_CG_grad);
@@ -96,7 +97,8 @@ disp('Modifield Gradient-Based Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C_GB_CG_mod,st_GB_CG_mod,norm_evol_GB_CG_mod_grad,norm_evol_GB_CG_mod_energy, estim_GB_CG_mod,  sol_norm_GB_CG_mod]=solver_GB_CG_modif(A,G,c_0,E,steps,toler,M_m,d,tau);
+    [C_GB_CG_mod,st_GB_CG_mod,norm_evol_GB_CG_mod_grad,norm_evol_GB_CG_mod_energy, estim_GB_CG_mod,  sol_norm_GB_CG_mod]...
+        =solver_GB_CG_modif(A,G,c_0,E,steps,toler,M_m,d,tau);
 
     T_GB_CG_mod(k,counter) = toc;
     stepses=size(norm_evol_GB_CG_mod_grad);
@@ -111,7 +113,8 @@ disp('Gradient-Based Preconditioned Conjugage Gradient solver')
 for k=1:1
     E=E_0(:,k); 
     tic;
-    [C_GB_PCG,st_GB_PCG, norm_evol_GB_PCG_rr, norm_evol_GB_PCG_energy, estim_GB_PCG,  sol_norm_GB_PCG]=solver_GB_PCG(A,G,c_0,E,steps,toler,M_m,d,tau);
+    [C_GB_PCG,st_GB_PCG, norm_evol_GB_PCG_rr, norm_evol_GB_PCG_energy, estim_GB_PCG,  sol_norm_GB_PCG]...
+     =solver_GB_PCG(A,G,c_0,E,steps,toler,M_m,d,tau);
 
     T_GB_PCG(k,counter) = toc;
          stepses=size(norm_evol_GB_PCG_rr);
@@ -126,11 +129,12 @@ end
 disp('Displacement-Based Preconditioned Conjugage Gradient solver')
 
 c_0=c_000;
-%toler = 1e-10;
+toler = 1e-10;
 for k=1:1
     E=E_0(:,k);
     tic;
-    [C_DB_PCG,st_DB_PCG,norm_evol_DB_PCG_rr,norm_evol_DB_PCG_energy, norm_evol_DB_PCG_grad, estim_DB_PCG,  sol_norm_DB_PCG]=solver_DB_PCG(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
+    [C_DB_PCG,st_DB_PCG,norm_evol_DB_PCG_rr,norm_evol_DB_PCG_energy, norm_evol_DB_PCG_grad, estim_DB_PCG,  sol_norm_DB_PCG]...
+        =solver_DB_PCG(A,G,c_0,E,steps,toler,M_m,tau);% with preconditioning
 
     T_DB_PCG(k,counter)=toc;
     S_DB_PCG(k,counter) = st_DB_PCG+1;
@@ -145,7 +149,7 @@ end
 end
 
 % % Plot estimates
- rel_estim_DB_PCG=(estim_DB_PCG./estim_DB_PCG(1));%.^(1/2);
+ rel_estim_DB_PCG=(estim_DB_PCG./estim_DB_PCG(1)).^(1/2);
  rel_estim_GB_CG=estim_GB_CG./estim_GB_CG(1);
 
 
@@ -161,37 +165,45 @@ end
   plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.xr')
   plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.or')
 
-    plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
+  plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
   plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.og')
   
   plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_rr,'-.xk')
   plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.ok')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB PCG || r ||','DB PCG ||Dr||', 'DB PCG ||r||_M', ...
-         'GB CG ||r||', 'GB CG ||r||_M',...
-          'GB CG mod ||r||', 'GB CG mod ||r||_M',...
-        'GB PCG ||Dr||', 'GB PCG ||r||_M')
-title('Residuals ')
-%% Plot residuals
+legend( 'DB PCG || r ||',       'DB PCG || r ||_M', ...
+        'GB CG || r^* ||',      'GB CG || r^* ||_M',...
+        'GB CG mod || r^{m} ||','GB CG mod || r ||_M',...
+        'GB PCG || r^{@} ||',   'GB PCG || r ||_M') %'DB PCG || Dr ||',
+title('Residuals ') 
+%% Plot residuals with estimates 
  figure 
  hold on
- plot((1:numel(estim_DB_PCG)),abs(rel_estim_DB_PCG),'.')
+
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--xb')
+ plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--ob')
+ 
+
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.xr')
+  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.or')
+
+  plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
+  plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.og')
+  
+  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_rr,'-.xk')
+  plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.ok')
+  
+  plot((1:numel(estim_DB_PCG)),abs(rel_estim_DB_PCG),'.')
   plot((1:numel(estim_DB_PCG)),abs(rel_estim_DB_PCG./(1-tau)),'.')
- plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--')
- plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_grad,'--')
- plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--')
- 
- 
- plot((1:numel(estim_GB_CG)),abs(rel_estim_GB_CG),'.')
- plot((1:numel(estim_GB_CG)),abs(rel_estim_GB_CG./(1-tau)),'.')
-  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.x')
-  plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.o')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB estim || e_k ||_K',' DB estim || e_k ||_K','DB || r ||','DB  ||Dr||', 'DB  ||r||_M', ...
-    'GB estim || e_k ||_K',' GB estim || e_k ||_K','GB  ||Dr||', 'GB ||r||_M')
-title('Residuals 2')
+legend( 'DB PCG || r ||',       'DB PCG || r ||_M', ...
+        'GB CG || r^* ||',      'GB CG || r^* ||_M',...
+        'GB CG mod || r^{m} ||','GB CG mod || r ||_M',...
+        'GB PCG || r^{@} ||',   'GB PCG || r ||_M',...
+        'DB estim || e_k ||_K',' DB estim || e_k ||_K') %'DB PCG || Dr ||',
+title('Residuals with  erorr K-norm estimates') 
 
 
 %% Plot solution norm
@@ -207,7 +219,7 @@ title('Residuals 2')
 plot((1:S_GB_PCG(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_PCG),'-.^')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB PCG ','GB CG ','GB CG modif','GB PCG ')
+legend('DB PCG || Du ||_C','GB CG || Du ||_C','GB mCG || Du ||_C','GB PCG || Du ||_C')
 title('solution norm relative')
 
 %% Plot solution norm
