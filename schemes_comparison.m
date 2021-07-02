@@ -4,7 +4,7 @@ clc;clear;
 
 counter=1;
 steps = 200;
-for loop=[10]
+for loop=[15]
 N_1=2*(loop^2)+1
 
 N_2=N_1; % number of points in x_2
@@ -79,7 +79,7 @@ disp('Gradient-Based Conjugage Gradient solver')
 
     S_GB_CG(1,counter) = st_GB_CG+1;
     
-    A_(:,1)=Hom_parameter_grad(C_GB_CG,C,G,E) % Compute homogenized parameter
+    A_(:,1)=Hom_parameter(C_GB_CG,C,G,E) % Compute homogenized parameter
     A_GB_CG(counter)=A_(1,1);
 
 
@@ -91,7 +91,7 @@ disp('Modifield Gradient-Based Conjugage Gradient solver')
 
     S_GB_CG_mod(1,counter) =st_GB_CG_mod+1;
 
-    A_(:,1)=Hom_parameter_grad(C_GB_CG_mod,C,G,E) % Compute homogenized parameter
+    A_(:,1)=Hom_parameter(C_GB_CG_mod,C,G,E) % Compute homogenized parameter
     A_GB_CG_mod(counter)=A_(1,1);
 
 
@@ -104,7 +104,7 @@ disp('Gradient-Based Preconditioned Conjugage Gradient solver')
 
     S_GB_PCG(1,counter) = st_GB_PCG+1;
 
-    A_(:,1)=Hom_parameter_grad(C_GB_PCG,C,G,E) % Compute homogenized parameter
+    A_(:,1)=Hom_parameter(C_GB_PCG,C,G,E) % Compute homogenized parameter
     A_GB_PCG(counter)=A_(1,1);
 
 

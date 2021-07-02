@@ -15,7 +15,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz,  norm_sol,e_norm_error]...
     nr0=sqrt(scalar_product_grad(r_0,r_0));
     norm_evol_rr(1)=nr0/nr0;
     
-    nz0r0 =sqrt(scalar_product_grad_energy_ref(r_0,r_0,C_ref));
+    nz0r0 =sqrt(scalar_product_grad_energy(r_0,r_0,C_ref));
     norm_evol_rz(1)=nz0r0/nz0r0;
     
     
@@ -38,7 +38,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz,  norm_sol,e_norm_error]...
         norm_evol_rr(st+1)=nr1/nr0;   
         
 
-        nz1r1=sqrt(scalar_product_grad_energy_ref(r_1,r_1,C_ref));
+        nz1r1=sqrt(scalar_product_grad_energy(r_1,r_1,C_ref));
         norm_evol_rz(st+1)=nz1r1/nz0r0;
         
             if ( norm_evol_rr(st+1)<toler) 
