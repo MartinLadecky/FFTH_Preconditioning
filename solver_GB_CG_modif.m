@@ -1,5 +1,5 @@
-function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
-    = solver_GB_CG_modif(A,G,c_0,E,M,C_ref,steps,toler,tau)
+function [c_1,st,norm_evol_rr, norm_evol_rz,   norm_sol] ...
+    = solver_GB_CG_modif(A,G,c_0,E,M,C_ref,steps,toler)
 %%
     
     grad_c_0=G.*c_0; 
@@ -24,10 +24,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
     
     
     p_0 =r_0;
-    
-    k=1;
-    d=0;
-    estim=0;
+
     for st = 1:steps
         Ap_0 = Projection(A,p_0,G,M);
 
@@ -63,32 +60,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
 
         c_0 = c_1;
         
-        %% error estimates
-        Delta(st)=real(alfa_0*r_1r_1);
-        curve(st)=0;
-        curve=curve+Delta(st);
-        if st >1
-            S=findS(curve,Delta,k);
-            num = S*Delta(st);
-            den = sum(Delta(k:st-1));
-            
-            while (d>= 0) && (num/den<= tau)
-                delay(k)=d;
-                estim(k)=den;
-                k=k+1;
-                d=d-1;
-                den=sum(Delta(k:st-1));
-            end
-            d=d+1;
-        end
     end
 end
 
 
-function [S]=findS(curve,Delta,k)
-    ind=find((curve(k)./curve) <= 1e-4,1,'last');
-    if isempty(ind)
-       ind = 1 ;
-    end
-    S = max(curve(ind:end-1)./Delta(ind:end-1));
-end
