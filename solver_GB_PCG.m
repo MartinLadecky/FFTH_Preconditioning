@@ -7,11 +7,8 @@ function [c_1,st,norm_evol_rr, norm_evol_rz,   norm_sol, e_norm_error]...
     norm_sol(1)=sqrt(scalar_product_grad_energy(c_0,c_0,A));
     
     
-    M_0 =Material_data_mul(A,grad_c_0);
-    Fb_0=cat(3,A(:,:,1,1).*E(1)+A(:,:,1,2).*E(2),...
-               A(:,:,2,1).*E(1)+A(:,:,2,2).*E(2));
-          
-    b_0=fftshift(fft2(ifftshift(Fb_0)));
+    M_0 =apply_material_data(A,grad_c_0);
+    b_0= apply_material_data(A,E);
     
     
     r_0 = b_0-M_0;
@@ -34,7 +31,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz,   norm_sol, e_norm_error]...
     p_0 = z_0;
     
     for st = 1:steps
-        Ap_0 = Material_data_mul(A,p_0);
+        Ap_0 = apply_material_data(A,p_0);
         
         z_0r_0=scalar_product_grad(r_0,z_0);
         p_0Ap_0=scalar_product_grad(p_0,Ap_0);

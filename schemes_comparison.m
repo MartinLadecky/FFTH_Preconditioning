@@ -2,12 +2,9 @@
 %% BEGIN
 clc;clear;
 
-
-
-
 counter=1;
 steps = 200;
-for loop=[7]
+for loop=[10]
 N_1=2*(loop^2)+1
 
 N_2=N_1; % number of points in x_2
@@ -22,19 +19,19 @@ x=zeros(N_2,N_1,2);
 
 %% Material coeficient matrix
 
-Pixels = imread('structure_4.png');
+Pixels = imread('structure_10.png');
 
 pixa=round(linspace(1,size(Pixels,2),N_1));
 piya=round(linspace(1,size(Pixels,1),N_2));
-par=1000
-  
 
+  
+phase_contrast_par=100
 C=zeros(N_2,N_1,2,2);
     for i=1:N_2
         for j=1:N_1    
-            C(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);
+            C(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),phase_contrast_par);
           % C(i,j,:,:)=a_matrix(x(i,j,:));
-          % C(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),par);          
+          % C(i,j,:,:)=a_matrix_img_aniso(Pixels(piya(i),pixa(j)),phase_contrast_par);          
         end       
     end
 
@@ -43,8 +40,8 @@ C=zeros(N_2,N_1,2,2);
 %% Material ananlysis
 d=[mean(mean(C(:,:,1,1))) mean(mean(C(:,:,1,2)));...
    mean(mean(C(:,:,2,1))) mean(mean(C(:,:,2,2)))];
-% d=[1 0;
-%    0 1];
+ %d=[1 0;
+ %   0 1];
 
 C_ref=zeros(N_2,N_1,2,2); 
 C_ref_inv=zeros(N_2,N_1,2,2); 
@@ -114,7 +111,7 @@ disp('Gradient-Based Preconditioned Conjugage Gradient solver')
 %% Displacement-Based Preconditioned Conjugage Gradient solver
 disp('Displacement-Based Preconditioned Conjugage Gradient solver')
 
-toler = 1e-10;
+%toler = 1e-10;
 
     [C_DB_PCG,st_DB_PCG,norm_evol_DB_PCG_rr,norm_evol_DB_PCG_energy, norm_evol_DB_PCG_grad,sol_norm_DB_PCG]...
         =solver_DB_PCG(C,G,c_0,E,M,steps,toler);% with preconditioning
@@ -150,30 +147,7 @@ legend( 'DB PCG || r ||',       'DB PCG || r ||_M', ...
         'GB CG || r^* ||',      'GB CG || r^* ||_M',...
         'GB CG mod || r^{m} ||','GB CG mod || r ||_M',...
         'GB PCG || r^{@} ||',   'GB PCG || r ||_M') %'DB PCG || Dr ||',
-title('Residuals ') 
-%% Plot residuals with estimates 
-figure 
-hold on
-
-    plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_rr,'--xb')
-    plot((1:S_DB_PCG(1,end)),norm_evol_DB_PCG_energy,'--ob')
-
-    plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.xr')
-    plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.or')
-
-    plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
-    plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.og')
-
-    plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_rr,'-.xk')
-    plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.ok')
- 
-set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend( 'DB PCG || r ||',       'DB PCG || r ||_M', ...
-        'GB CG || r^* ||',      'GB CG || r^* ||_M',...
-        'GB CG mod || r^{m} ||','GB CG mod || r ||_M',...
-        'GB PCG || r^{@} ||',   'GB PCG || r ||_M') %'DB PCG || Dr ||',
-title('Residuals with  erorr K-norm estimates') 
-
+title('Residuals ')
 
 %% Plot solution norm
 figure 
@@ -204,30 +178,6 @@ hold on
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend('DB PCG ','GB CG ','GB CG modif','GB PCG ')
 title('solution norm: absolut')
-
-%% Plot hom_mat prop
-% A_refer=real(A3);%9.403399951113226;
-% figure 
-%  hold on
-% 
-%  plot(NoP,abs(A_refer-real(A3))','^')
-%   plot(NoP,abs(A_refer-real(Ag))','-.^') 
-%   
-%  plot(NoP,abs(A_refer-real(Ap))','-.*')
-%  plot(NoP,abs(A_refer-real(Apc))','-.>') 
-% 
-%  set(gca, 'XScale', 'linear', 'YScale', 'log');
-% 
-% legend('DB','DB modif','GB orig','GB modif')
-%  title(' Hom parameter error')
-% figure 
-%  hold on
-%  plot(NoP,imag(A1)','x')
-%  plot(NoP,imag(A2)','o')
-%  plot(NoP,imag(A3)','^')
-%  plot(NoP,imag(Ap)','-.*')
-%  plot(NoP,imag(Ag)','-.^') 
-% legend('in G','Symetric','Left','GB','grad norm')
 
 
 close all

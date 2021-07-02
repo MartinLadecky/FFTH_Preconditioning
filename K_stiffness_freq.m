@@ -1,4 +1,4 @@
-function [Mc] = LHS_freq(A,c,G)
+function [Mc] = K_stiffness_freq(A,c,G)
 % transformace Fx a derivace G*F
 % grad(c)
 

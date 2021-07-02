@@ -2,7 +2,7 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, norm_sol]...
     = solver_DB_PCG(A,G,c_0,E,M,steps,toler)
     %% input
     norm_sol(1)=sqrt(scalar_product_grad_energy(G.*c_0,G.*c_0,A));
-    M_0 = LHS_freq(A,c_0,G); 
+    M_0 = K_stiffness_freq(A,c_0,G); 
     b_0 = RHS_freq(A,E,G);  
 
     r_0 = b_0-M_0; 
@@ -21,7 +21,7 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, norm_sol]...
     p_0 = z_0;
 
     for st = 1:steps
-        Ap_0 = LHS_freq(A,p_0,G);
+        Ap_0 = K_stiffness_freq(A,p_0,G);
      
         z_0r_0= scalar_product(z_0,r_0 );
         p_0Ap_0=scalar_product(p_0,Ap_0);
