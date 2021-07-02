@@ -1,5 +1,5 @@
 function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
-    = solver_GB_CG_modif(A,G,c_0,E,steps,toler,M_f,C_ref,tau)
+    = solver_GB_CG_modif(A,G,c_0,E,M,C_ref,steps,toler,tau)
 %%
     
     grad_c_0=G.*c_0; 
@@ -7,8 +7,8 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
 
     norm_sol(1)=sqrt(scalar_product_grad_energy(c_0,c_0,A));
     
-    M_0 = Projection(A,grad_c_0,G,M_f);
-    b_0 = Projection_rhs(A,E,G,M_f);
+    M_0 = Projection(A,grad_c_0,G,M);
+    b_0 = Projection_rhs(A,E,G,M);
 
     r_0 = b_0-M_0; % x_0=0 
     
@@ -29,7 +29,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol] ...
     d=0;
     estim=0;
     for st = 1:steps
-        Ap_0 = Projection(A,p_0,G,M_f);
+        Ap_0 = Projection(A,p_0,G,M);
 
         r_0r_0=scalar_product_grad_energy_ref(r_0,r_0,C_ref);
         p_0Ap_0=scalar_product_grad_energy_ref(p_0,Ap_0,C_ref);

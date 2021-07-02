@@ -1,4 +1,5 @@
-function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = solver_GB_PCG(A,G,c_0,E,steps,toler,M_f,C_ref,tau)
+function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error]...
+    = solver_GB_PCG(A,G,c_0,E,M,steps,toler,tau)
 
     grad_c_0=G.*c_0; % 
     c_0=grad_c_0;
@@ -16,7 +17,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = s
     r_0 = b_0-M_0;
 
     
-    z_0=Projection_plain(r_0,G,M_f);
+    z_0=Projection_plain(r_0,G,M);
 
    
     Dr_0=conj(G).*r_0;
@@ -49,7 +50,7 @@ function [c_1,st,norm_evol_rr, norm_evol_rz, estim,  norm_sol, e_norm_error] = s
 
         r_1 = r_0 - alfa_0*Ap_0;
         
-        z_1=Projection_plain(r_1,G,M_f);
+        z_1=Projection_plain(r_1,G,M);
 
         Dr_1=conj(G).*r_1;
         Dr_1=Dr_1(:,:,1)+Dr_1(:,:,2) ;

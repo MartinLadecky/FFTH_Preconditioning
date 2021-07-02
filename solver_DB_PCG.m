@@ -1,4 +1,5 @@
-function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] = solver_DB_PCG(A,G,c_0,E,steps,toler,M_f,tau)
+function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol]...
+    = solver_DB_PCG(A,G,c_0,E,M,steps,toler,tau)
     %% input
     norm_sol(1)=sqrt(scalar_product_grad_energy(G.*c_0,G.*c_0,A));
     M_0 = LHS_freq(A,c_0,G); 
@@ -12,7 +13,7 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
     nDr0Dr0=sqrt(scalar_product_grad(G.*r_0,G.*r_0));
     norm_evol_grad(1)=nDr0Dr0/nDr0Dr0;
 
-    z_0 = r_0./M_f; 
+    z_0 = r_0./M; 
     
     nz0r0 = sqrt(scalar_product(r_0,z_0));
     norm_evol_energy(1)=nz0r0/nz0r0;
@@ -34,11 +35,11 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
         norm_sol(st+1)=sqrt(scalar_product_grad_energy(G.*c_1,G.*c_1,A));
         r_1 = r_0-alfa_0*Ap_0;
         
-        nr1 =scalar_product(r_1,r_1 );
+        nr1 =sqrt(scalar_product(r_1,r_1 ));
         norm_evol_rr(st+1)=nr1/nr0;
 
         
-        z_1=r_1./M_f;
+        z_1=r_1./M;
         
         z_1r_1=scalar_product(z_1,r_1 );
         norm_evol_energy(st+1)=sqrt(z_1r_1)/nz0r0;
@@ -53,7 +54,8 @@ function [c_1,st,norm_evol_rr,norm_evol_energy,norm_evol_grad, estim,norm_sol] =
 
         beta_1 =z_1r_1 /z_0r_0;
         p_1 = z_1 + beta_1*p_0;
-        %% 
+        %% reiniticialisation
+       
         p_0 = p_1;
         r_0 = r_1;
         z_0 = z_1; 
