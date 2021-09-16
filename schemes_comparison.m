@@ -1,10 +1,9 @@
 
 %% BEGIN
-clc;clear;
-
+clc;clear; 
 counter=1;
-steps = 200;
-for loop=[15]
+steps = 500;
+for loop=[11]
 N_1=2*(loop^2)+1
 
 N_2=N_1; % number of points in x_2
@@ -40,8 +39,10 @@ C=zeros(N_2,N_1,2,2);
 %% Material ananlysis
 d=[mean(mean(C(:,:,1,1))) mean(mean(C(:,:,1,2)));...
    mean(mean(C(:,:,2,1))) mean(mean(C(:,:,2,2)))];
- %d=[1 0;
- %   0 1];
+%d=[1 0;
+%   0 1];
+
+
 
 C_ref=zeros(N_2,N_1,2,2); 
 C_ref_inv=zeros(N_2,N_1,2,2); 
@@ -81,7 +82,18 @@ disp('Gradient-Based Conjugage Gradient solver')
     
     A_(:,1)=Hom_parameter(C_GB_CG,C,G,E) % Compute homogenized parameter
     A_GB_CG(counter)=A_(1,1);
+    
+    
+disp('Gradient-Based Conjugage Gradient solver with oblique projection')
 
+   [C_GB_CG_right,st_GB_CG_right, norm_evol_GB_CG_grad_right, norm_evol_GB_CG_energy_right,   sol_norm_GB_CG_right]...
+       =solver_GB_CG_right(C,G,c_0,E,M,d,steps,toler);
+
+    S_GB_CG_right(1,counter) = st_GB_CG_right+1;
+    
+    A_(:,1)=Hom_parameter(C_GB_CG_right,C,G,E) % Compute homogenized parameter
+    A_GB_CG_right(counter)=A_(1,1);    
+    
 
 disp('Modifield Gradient-Based Conjugage Gradient solver')
 
@@ -106,6 +118,18 @@ disp('Gradient-Based Preconditioned Conjugage Gradient solver')
 
     A_(:,1)=Hom_parameter(C_GB_PCG,C,G,E) % Compute homogenized parameter
     A_GB_PCG(counter)=A_(1,1);
+    
+disp('Gradient-Based Preconditioned Conjugage Gradient solver with skew projection')
+
+
+    [C_GB_PCG_right,st_GB_PCG_right, norm_evol_GB_PCG_rr_right, norm_evol_GB_PCG_energy_right, sol_norm_GB_PCG_right]...
+     =solver_GB_PCG_right(C,G,c_0,E,M,d,steps,toler);
+
+
+    S_GB_PCG_right(1,counter) = st_GB_PCG_right+1;
+
+    A_(:,1)=Hom_parameter(C_GB_PCG_right,C,G,E) % Compute homogenized parameter
+    A_GB_PCG_right(counter)=A_(1,1);
 
 
 %% Displacement-Based Preconditioned Conjugage Gradient solver
@@ -135,18 +159,26 @@ hold on
 
     plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_grad,'-.xr')
     plot((1:S_GB_CG(1,end)),norm_evol_GB_CG_energy,'-.or')
+    
+    plot((1:S_GB_CG_right(1,end)),norm_evol_GB_CG_grad_right,'-.xy')
+    plot((1:S_GB_CG_right(1,end)),norm_evol_GB_CG_energy_right,'-.oy')
 
     plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_grad,'-.xg')
     plot((1:S_GB_CG_mod(1,end)),norm_evol_GB_CG_mod_energy,'-.og')
 
     plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_rr,'-.xk')
     plot((1:S_GB_PCG(1,end)),norm_evol_GB_PCG_energy,'-.ok')
+    
+     plot((1:S_GB_PCG_right(1,end)),norm_evol_GB_PCG_rr_right,'-.xm')
+    plot((1:S_GB_PCG_right(1,end)),norm_evol_GB_PCG_energy_right,'-.om')
 
 set(gca, 'XScale', 'linear', 'YScale', 'log');
 legend( 'DB PCG || r ||',       'DB PCG || r ||_M', ...
         'GB CG || r^* ||',      'GB CG || r^* ||_M',...
+        'GB CG right || r^* ||',      'GB CG right || r^* ||_M',...
         'GB CG mod || r^{m} ||','GB CG mod || r ||_M',...
-        'GB PCG || r^{@} ||',   'GB PCG || r ||_M') %'DB PCG || Dr ||',
+        'GB PCG || r^{@} ||',   'GB PCG || r ||_M',...
+        'GB PCG non || r ||',   'GB PCG non|| r ||_M') %'DB PCG || Dr ||',
 title('Residuals ')
 
 %% Plot solution norm
@@ -155,13 +187,15 @@ hold on
 
     plot((1:S_DB_PCG(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_DB_PCG),'-.^')
     plot((1:S_GB_CG(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_CG),'-.*')
-
+    plot((1:S_GB_CG_right(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_CG_right),'-.*')
+    
     plot((1:S_GB_CG_mod(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_CG_mod),'-.o')
   
     plot((1:S_GB_PCG(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_PCG),'-.^')
+    plot((1:S_GB_PCG_right(1,end)),abs(sol_norm_DB_PCG(end)-sol_norm_GB_PCG_right),'-.^')
  
 set(gca, 'XScale', 'linear', 'YScale', 'log');
-legend('DB PCG || Du ||_C','GB CG || Du ||_C','GB mCG || Du ||_C','GB PCG || Du ||_C')
+legend('DB PCG || Du ||_C','GB CG || Du ||_C','GB CG right || Du ||_C','GB mCG || Du ||_C','GB PCG || Du ||_C','GB PCG right || Du ||_C')
 title('solution norm: relative')
 
 %% Plot solution norm
